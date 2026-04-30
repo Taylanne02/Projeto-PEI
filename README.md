@@ -73,10 +73,11 @@ http://localhost:5173
 
 ## 📌 Próximos passos
 
-* Integrar frontend com backend via API
+* Configurar CORS no backend se necessário para comunicação entre frontend e backend
 * Configurar variáveis de ambiente
 * Adicionar banco de dados
-* Melhorar organização do projeto
-* Configurar CORS no backend se necessário para comunicação entre frontend e backend
+* Melhorar organização do projet
+* Fazer frontend
+* Integrar frontend com backend via API
 
 ---
