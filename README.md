@@ -14,9 +14,6 @@ Este projeto é uma aplicação fullstack com backend em Node.js usando Express 
 
   * React
   * Vite
-* Ferramentas:
-
-  * ESLint
 
 ---
 
@@ -73,25 +70,6 @@ http://localhost:5173
 
 ---
 
-## 📁 Estrutura sugerida
-
-```
-/projeto
-  /backend
-    server.js
-  /frontend
-    (projeto vite)
-```
-
----
-
-## 🧠 Observações
-
-* O backend roda normalmente na porta 3000 (ou definida no server.js)
-* O frontend roda na porta padrão do Vite (5173)
-* Configure CORS no backend se necessário para comunicação entre frontend e backend
-
----
 
 ## 📌 Próximos passos
 
@@ -99,5 +77,6 @@ http://localhost:5173
 * Configurar variáveis de ambiente
 * Adicionar banco de dados
 * Melhorar organização do projeto
+* Configurar CORS no backend se necessário para comunicação entre frontend e backend
 
 ---
