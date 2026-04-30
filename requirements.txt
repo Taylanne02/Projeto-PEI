@@ -1,0 +1,8 @@
+# Backend
+express
+eslint
+
+# Frontend
+react
+react-dom
+vite
