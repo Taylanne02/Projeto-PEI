@@ -1,0 +1,17 @@
+Backend
+
+    npm init
+    npm init -y
+    npm install express
+    npm install better-sqlite3
+    npm install eslint --save-dev
+    
+    para executar backend: node server.js
+
+Frontend
+    npm create vite@latest
+    npm install
+    
+    para executar frontend: npm run dev
+    
+    
