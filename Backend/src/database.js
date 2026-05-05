@@ -8,7 +8,7 @@ db.exec(`
             nome TEXT NOT NULL,
             email TEXT NOT NULL,
             senha TEXT NOT NULL,
-            cpf TEXT NOT NULL,
+            cpf TEXT NOT NULL UNIQUE,
             tipoUsuario TEXT NOT NULL CHECK(tipoUsuario IN ('professor', 'aluno'))
         )
     `);
