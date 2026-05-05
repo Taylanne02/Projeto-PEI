@@ -1,6 +1,6 @@
 // importação das bibliotecas
 const express = require("express");
-const db = require("./database");
+const db = require("./src/database");
 
 // iniciação do servidor 
 const app = express();
