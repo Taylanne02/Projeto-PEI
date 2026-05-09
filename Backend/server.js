@@ -14,6 +14,8 @@ app.use(cors({
 }));
 app.use(express.json());
 
+app.use("/usuario", require("./src/rotas/usuario"));
+
 // verificação de teste para ver se está ativo
 app.get('/', (req, res) => {
   res.json({ mensagem: 'Servidor funcionando!' });
