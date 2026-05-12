@@ -57,4 +57,80 @@ router.post("/", (req, res) => {
   }
 });
 
+// POST - Login do usuário
+router.post("/login", (req, res) => {
+  try {
+    const { email, senha } = req.body;
+
+    if (!email || !senha) {
+      return res.status(400).json({ erro: "Email e senha são obrigatórios" });
+    }
+
+    const usuario = db
+      .prepare("SELECT * FROM usuario WHERE email = ? AND senha = ?")
+      .get(email, senha);
+
+    if (!usuario) {
+      return res.status(404).json({ erro: "Email ou senha inválidos" });
+    }
+
+    res.status(200).json({
+      mensagem: "Login realizado com sucesso!",
+      usuario
+    });
+
+  } catch (erro) {
+    console.log(erro);
+    res.status(500).json({ erro: "Erro ao fazer login" });
+  }
+});
+
+
+// PUT - Editar perfil do usuário
+router.put("/:id_usuario", (req, res) => {
+  try {
+    const { id_usuario } = req.params;
+    const { nome, email, senha, cpf } = req.body;
+
+    if (!nome || !email || !senha || !cpf) {
+      return res.status(400).json({ erro: "Todos os campos são obrigatórios" });
+    }
+
+    const usuarioExiste = db
+      .prepare("SELECT * FROM usuario WHERE id_usuario = ?")
+      .get(id_usuario);
+
+    if (!usuarioExiste) {
+      return res.status(404).json({ erro: "Usuário não encontrado" });
+    }
+
+    const emailCpfExiste = db
+      .prepare(`
+        SELECT * FROM usuario
+        WHERE (email = ? OR cpf = ?)
+        AND id_usuario != ?
+      `)
+      .get(email, cpf, id_usuario);
+
+    if (emailCpfExiste) {
+      return res.status(400).json({ erro: "Email ou CPF já está sendo usado por outro usuário" });
+    }
+
+    const resultado = db.prepare(`
+      UPDATE usuario
+      SET nome = ?, email = ?, senha = ?, cpf = ?
+      WHERE id_usuario = ?
+    `).run(nome, email, senha, cpf, id_usuario);
+
+    res.status(200).json({
+      mensagem: "Perfil atualizado com sucesso!",
+      linhasAlteradas: resultado.changes
+    });
+
+  } catch (erro) {
+    console.log(erro);
+    res.status(500).json({ erro: "Erro ao editar perfil" });
+  }
+});
+
 module.exports = router;
