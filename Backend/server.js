@@ -14,7 +14,10 @@ app.use(cors({
 }));
 app.use(express.json());
 
+//Rotas
 app.use("/usuario", require("./src/rotas/usuario"));
+app.use("/professor", require("./src/rotas/professor"));
+app.use("/videoaula", require("./src/rotas/videoaula"));
 
 // verificação de teste para ver se está ativo
 app.get('/', (req, res) => {

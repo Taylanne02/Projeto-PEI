@@ -57,7 +57,7 @@ router.post("/", (req, res) => {
   }
 });
 
-// POST - Login do usuário
+// POST- Login do usuário
 router.post("/login", (req, res) => {
   try {
     const { email, senha } = req.body;
@@ -86,7 +86,7 @@ router.post("/login", (req, res) => {
 });
 
 
-// PUT - Editar perfil do usuário
+// PUT- Editar perfil do usuário
 router.put("/:id_usuario", (req, res) => {
   try {
     const { id_usuario } = req.params;
