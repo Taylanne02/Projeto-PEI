@@ -18,6 +18,8 @@ app.use(express.json());
 app.use("/usuario", require("./src/rotas/usuario"));
 app.use("/professor", require("./src/rotas/professor"));
 app.use("/videoaula", require("./src/rotas/videoaula"));
+app.use("/aluno", require("./src/rotas/aluno"));
+app.use("/pagamento", require("./src/rotas/pagamento"));
 
 // verificação de teste para ver se está ativo
 app.get('/', (req, res) => {

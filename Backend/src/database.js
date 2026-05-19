@@ -62,7 +62,7 @@ db.exec(`
             id_aluno INTEGER NOT NULL,
             id_videoaula INTEGER NOT NULL,
             valor REAL NOT NULL,
-            status TEXT NOT NULL CHECK (status IN ('pendente', 'concluido', 'cancelado')),
+            status TEXT NOT NULL CHECK (status IN ('concluido', 'cancelado')),
             dataPagamento TEXT NOT NULL,
 
             FOREIGN KEY (id_aluno) REFERENCES aluno(id_aluno),
