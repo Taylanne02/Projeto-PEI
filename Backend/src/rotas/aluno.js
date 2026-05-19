@@ -73,16 +73,14 @@ router.get("/professor/:id_professor", (req, res) => {
 });
 
 // POST - comprarVideoAula()
-// Agora recebe id_videoaula e formaPagamento pelo body.
-// O pagamento já fica concluído.
-router.post("/:id_aluno/comprar", (req, res) => {
+router.post("/:id_aluno/comprar/:id_videoaula", (req, res) => {
   try {
-    const { id_aluno } = req.params;
-    const { id_videoaula, formaPagamento } = req.body;
+    const { id_aluno, id_videoaula } = req.params;
+    const { formaPagamento } = req.body;
 
-    if (!id_videoaula || !formaPagamento) {
+    if (!formaPagamento) {
       return res.status(400).json({
-        erro: "id_videoaula e formaPagamento são obrigatórios"
+        erro: "Forma de pagamento é obrigatória"
       });
     }
 
@@ -104,19 +102,29 @@ router.post("/:id_aluno/comprar", (req, res) => {
 
     const pagamentoExistente = db.prepare(`
       SELECT * FROM pagamento
-      WHERE id_aluno = ? 
-      AND id_videoaula = ? 
+      WHERE id_aluno = ?
+      AND id_videoaula = ?
       AND status = 'concluido'
     `).get(id_aluno, id_videoaula);
 
     if (pagamentoExistente) {
-      return res.status(400).json({ erro: "Aluno já comprou essa videoaula" });
+      return res.status(400).json({
+        erro: "Aluno já comprou essa videoaula"
+      });
     }
 
-    const valorFinal = videoaula.gratuito === 1 ? 0 : videoaula.valor;
+    const valorFinal = videoaula.gratuito === 1
+      ? 0
+      : videoaula.valor;
 
     const pagamento = db.prepare(`
-      INSERT INTO pagamento (id_aluno, id_videoaula, valor, status, dataPagamento)
+      INSERT INTO pagamento (
+        id_aluno,
+        id_videoaula,
+        valor,
+        status,
+        dataPagamento
+      )
       VALUES (?, ?, ?, ?, ?)
     `).run(
       id_aluno,
@@ -149,6 +157,7 @@ router.post("/:id_aluno/comprar", (req, res) => {
     }
 
     const historicoAtual = aluno.historicoCompras || "";
+
     const novoHistorico = historicoAtual
       ? `${historicoAtual},${id_videoaula}`
       : `${id_videoaula}`;
@@ -172,79 +181,73 @@ router.post("/:id_aluno/comprar", (req, res) => {
 
   } catch (erro) {
     console.log(erro);
-    res.status(500).json({ erro: "Erro ao comprar videoaula" });
+
+    res.status(500).json({
+      erro: "Erro ao comprar videoaula"
+    });
   }
 });
 
-// POST - avaliarAula()
-router.post("/:id_aluno/avaliar/:id_videoaula", (req, res) => {
+// DELETE - cancelarAula()
+router.delete("/:id_aluno/cancelar/:id_videoaula", (req, res) => {
   try {
+
     const { id_aluno, id_videoaula } = req.params;
-    const { nota, comentario } = req.body;
 
-    if (!nota) {
-      return res.status(400).json({ erro: "Nota é obrigatória" });
-    }
-
-    if (nota < 1 || nota > 5) {
-      return res.status(400).json({ erro: "A nota deve ser entre 1 e 5" });
-    }
-
-    const compraExiste = db.prepare(`
+    const pagamento = db.prepare(`
       SELECT * FROM pagamento
-      WHERE id_aluno = ? 
-      AND id_videoaula = ? 
+      WHERE id_aluno = ?
+      AND id_videoaula = ?
       AND status = 'concluido'
     `).get(id_aluno, id_videoaula);
 
-    if (!compraExiste) {
-      return res.status(400).json({ erro: "O aluno precisa ter pagamento concluído para avaliar" });
+    if (!pagamento) {
+      return res.status(404).json({
+        erro: "Pagamento não encontrado"
+      });
     }
 
-    const resultado = db.prepare(`
-      INSERT INTO avaliacao (id_aluno, id_videoaula, nota, comentario)
-      VALUES (?, ?, ?, ?)
-    `).run(id_aluno, id_videoaula, nota, comentario || "");
+    const videoaula = db.prepare(`
+      SELECT * FROM videoaula
+      WHERE id_videoaula = ?
+    `).get(id_videoaula);
 
-    res.status(201).json({
-      mensagem: "Avaliação cadastrada com sucesso!",
-      id_avaliacao: resultado.lastInsertRowid
-    });
+    db.prepare(`
+      UPDATE pagamento
+      SET status = 'cancelado'
+      WHERE id_pagamento = ?
+    `).run(pagamento.id_pagamento);
 
-  } catch (erro) {
-    console.log(erro);
-    res.status(500).json({ erro: "Erro ao avaliar aula" });
-  }
-});
+    db.prepare(`
+      UPDATE videoaula
+      SET totalVendas = totalVendas - 1
+      WHERE id_videoaula = ?
+      AND totalVendas > 0
+    `).run(id_videoaula);
 
-// PUT - configurarFormaPagamento()
-router.put("/:id_aluno/formaPagamento", (req, res) => {
-  try {
-    const { id_aluno } = req.params;
-    const { formaPagamento } = req.body;
+    if (videoaula.gratuito === 0) {
 
-    if (!formaPagamento) {
-      return res.status(400).json({ erro: "Forma de pagamento é obrigatória" });
-    }
+      const comissaoProfessor = pagamento.valor * 0.7;
 
-    const resultado = db.prepare(`
-      UPDATE aluno
-      SET formaPagamento = ?
-      WHERE id_aluno = ?
-    `).run(formaPagamento, id_aluno);
-
-    if (resultado.changes === 0) {
-      return res.status(404).json({ erro: "Aluno não encontrado" });
+      db.prepare(`
+        UPDATE professor
+        SET saldoComissao = saldoComissao - ?
+        WHERE id_professor = ?
+      `).run(comissaoProfessor, videoaula.id_professor);
     }
 
     res.status(200).json({
-      mensagem: "Forma de pagamento configurada com sucesso!",
-      formaPagamento
+      mensagem: "Compra cancelada com sucesso!",
+      status: "cancelado"
     });
 
   } catch (erro) {
+
     console.log(erro);
-    res.status(500).json({ erro: "Erro ao configurar forma de pagamento" });
+
+    res.status(500).json({
+      erro: "Erro ao cancelar compra"
+    });
   }
 });
 
