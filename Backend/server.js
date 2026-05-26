@@ -20,6 +20,7 @@ app.use("/professor", require("./src/rotas/professor"));
 app.use("/videoaula", require("./src/rotas/videoaula"));
 app.use("/aluno", require("./src/rotas/aluno"));
 app.use("/pagamento", require("./src/rotas/pagamento"));
+app.use("/avaliacao", require("./src/rotas/avaliacao"));
 
 // verificação de teste para ver se está ativo
 app.get('/', (req, res) => {
