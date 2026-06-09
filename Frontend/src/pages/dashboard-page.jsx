@@ -20,6 +20,7 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import { useProfessor } from '@/context/professor-context'
+import { formatSales } from '@/lib/format'
 
 const currency = new Intl.NumberFormat('pt-BR', {
   style: 'currency',
@@ -97,7 +98,7 @@ export function DashboardPage() {
         />
         <StatCard
           label="Total de vendas"
-          value={`${totalSales} vendas`}
+          value={formatSales(totalSales)}
           icon={ShoppingBag}
         />
         <StatCard
@@ -165,7 +166,7 @@ export function DashboardPage() {
                       {lesson.titulo}
                     </p>
                     <p className="mt-1 text-sm text-slate-500">
-                      {lesson.totalVendas} vendas
+                      {formatSales(lesson.totalVendas)}
                     </p>
                   </div>
                   <Badge variant={lesson.gratuito ? 'secondary' : 'outline'}>

@@ -13,6 +13,7 @@ import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useProfessor } from '@/context/professor-context'
+import { formatSales } from '@/lib/format'
 
 function RatingStars({ rating }) {
   return (
@@ -99,7 +100,7 @@ export function ReviewsPage() {
                       <div className="mt-2 flex flex-wrap items-center gap-3 text-sm text-slate-500">
                         <span className="flex items-center gap-1.5">
                           <ShoppingBag className="size-4" />
-                          {lesson.totalVendas} vendas
+                          {formatSales(lesson.totalVendas)}
                         </span>
                         <Badge variant={lesson.gratuito ? 'secondary' : 'outline'}>
                           {lesson.gratuito ? 'Gratuita' : 'Paga'}
