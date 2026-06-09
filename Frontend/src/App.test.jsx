@@ -27,7 +27,7 @@ function renderRoute(path) {
 
 describe('rotas do painel do professor', () => {
   it.each([
-    ['/professor/1', 'Visão geral'],
+    ['/professor/1', 'Olá, Carlos Professor'],
     ['/professor/1/videoaulas/nova', 'Adicionar videoaula'],
     ['/professor/1/videoaulas', 'Gerenciar videoaulas'],
     ['/professor/1/avaliacoes', 'Avaliações e desempenho'],
