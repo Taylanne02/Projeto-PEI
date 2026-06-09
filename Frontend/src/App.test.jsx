@@ -1,6 +1,19 @@
 import { render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
+
+vi.mock('@/services/api', () => ({
+  api: {
+    getProfessorProfile: vi.fn().mockResolvedValue({
+      professor: { id_professor: 1, nome: 'Carlos Professor' },
+    }),
+    getProfessorSales: vi.fn().mockResolvedValue({
+      totalVendas: 1,
+      saldoComissao: 20.93,
+      videoaulas: [],
+    }),
+  },
+}))
 
 import { AppRoutes } from './App'
 
@@ -19,11 +32,11 @@ describe('rotas do painel do professor', () => {
     ['/professor/1/videoaulas', 'Gerenciar videoaulas'],
     ['/professor/1/avaliacoes', 'Avaliações e desempenho'],
     ['/professor/1/financeiro', 'Financeiro'],
-  ])('renderiza %s', (path, heading) => {
+  ])('renderiza %s', async (path, heading) => {
     renderRoute(path)
 
     expect(
-      screen.getByRole('heading', { name: heading }),
+      await screen.findByRole('heading', { name: heading }),
     ).toBeInTheDocument()
   })
 
