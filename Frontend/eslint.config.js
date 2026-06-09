@@ -21,7 +21,6 @@ export default defineConfig([
   {
     files: [
       'src/components/ui/**/*.{js,jsx}',
-      'src/context/**/*.{js,jsx}',
     ],
     rules: {
       'no-unused-vars': ['error', { varsIgnorePattern: '^React$' }],

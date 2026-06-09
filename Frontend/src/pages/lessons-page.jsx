@@ -1,7 +1,8 @@
 import { Pencil, Plus, ShoppingBag, Trash2 } from 'lucide-react'
 import { useState } from 'react'
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation, useParams } from 'react-router-dom'
 
+import { DataError, DataLoading } from '@/components/data-state'
 import { LessonForm } from '@/components/lesson-form'
 import { PageHeading } from '@/components/page-heading'
 import {
@@ -31,8 +32,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import { useProfessor } from '@/context/professor-context'
+import { useProfessorData } from '@/hooks/use-professor-data'
 import { formatSales } from '@/lib/format'
+import { api } from '@/services/api'
 
 const currency = new Intl.NumberFormat('pt-BR', {
   style: 'currency',
@@ -40,7 +42,9 @@ const currency = new Intl.NumberFormat('pt-BR', {
 })
 
 export function LessonsPage() {
-  const { idProfessor, lessons, apiClient, refresh } = useProfessor()
+  const { idProfessor } = useParams()
+  const { lessons, loading, error: loadError, refresh } =
+    useProfessorData(idProfessor)
   const location = useLocation()
   const [editingLesson, setEditingLesson] = useState(null)
   const [deletingLesson, setDeletingLesson] = useState(null)
@@ -50,14 +54,14 @@ export function LessonsPage() {
   )
 
   async function updateLesson(data) {
-    await apiClient.updateVideoLesson(editingLesson.id_videoaula, data)
+    await api.updateVideoLesson(editingLesson.id_videoaula, data)
     await refresh()
     setEditingLesson(null)
   }
 
   async function deleteLesson() {
     try {
-      await apiClient.deleteVideoLesson(deletingLesson.id_videoaula)
+      await api.deleteVideoLesson(deletingLesson.id_videoaula)
       await refresh()
       setDeletingLesson(null)
     } catch (requestError) {
@@ -65,6 +69,9 @@ export function LessonsPage() {
       setDeletingLesson(null)
     }
   }
+
+  if (loading) return <DataLoading />
+  if (loadError) return <DataError error={loadError} onRetry={refresh} />
 
   return (
     <>

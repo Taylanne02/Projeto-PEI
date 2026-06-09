@@ -8,9 +8,10 @@ import {
   Video,
   WalletCards,
 } from 'lucide-react'
-import { Link } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
 
 import { PageHeading } from '@/components/page-heading'
+import { DataError, DataLoading } from '@/components/data-state'
 import { Badge } from '@/components/ui/badge'
 import {
   Card,
@@ -19,7 +20,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
-import { useProfessor } from '@/context/professor-context'
+import { useProfessorData } from '@/hooks/use-professor-data'
 import { formatSales } from '@/lib/format'
 
 const currency = new Intl.NumberFormat('pt-BR', {
@@ -71,13 +72,20 @@ function StatCard({ label, value, icon: Icon }) {
 }
 
 export function DashboardPage() {
+  const { idProfessor } = useParams()
   const {
-    idProfessor,
     professor,
     commissionBalance,
     totalSales,
     lessons,
-  } = useProfessor()
+    loading,
+    error,
+    refresh,
+  } = useProfessorData(idProfessor, { profile: true })
+
+  if (loading) return <DataLoading />
+  if (error) return <DataError error={error} onRetry={refresh} />
+
   const basePath = `/professor/${idProfessor}`
   const topLessons = [...lessons]
     .sort((first, second) => second.totalVendas - first.totalVendas)

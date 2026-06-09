@@ -1,5 +1,7 @@
 import { Banknote, CircleDollarSign, Percent, TrendingUp } from 'lucide-react'
+import { useParams } from 'react-router-dom'
 
+import { DataError, DataLoading } from '@/components/data-state'
 import { PageHeading } from '@/components/page-heading'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Badge } from '@/components/ui/badge'
@@ -12,7 +14,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { useProfessor } from '@/context/professor-context'
+import { useProfessorData } from '@/hooks/use-professor-data'
 import { calculateLessonFinance } from '@/lib/finance'
 
 const currency = new Intl.NumberFormat('pt-BR', {
@@ -37,7 +39,13 @@ function SummaryCard({ label, value, icon: Icon, testId }) {
 }
 
 export function FinancePage() {
-  const { commissionBalance, lessons } = useProfessor()
+  const { idProfessor } = useParams()
+  const { commissionBalance, lessons, loading, error, refresh } =
+    useProfessorData(idProfessor)
+
+  if (loading) return <DataLoading />
+  if (error) return <DataError error={error} onRetry={refresh} />
+
   const financialLessons = lessons.map((lesson) => ({
     ...lesson,
     ...calculateLessonFinance(lesson),

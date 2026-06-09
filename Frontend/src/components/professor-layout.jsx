@@ -8,10 +8,7 @@ import {
 } from 'lucide-react'
 import { NavLink, Outlet, useParams } from 'react-router-dom'
 
-import {
-  ProfessorProvider,
-  useProfessor,
-} from '@/context/professor-context'
+import { useProfessorData } from '@/hooks/use-professor-data'
 import { cn } from '@/lib/utils'
 
 const navigation = [
@@ -22,8 +19,9 @@ const navigation = [
   { label: 'Financeiro', path: 'financeiro', icon: CircleDollarSign },
 ]
 
-function ProfessorShell() {
-  const { idProfessor, professor } = useProfessor()
+export function ProfessorLayout() {
+  const { idProfessor } = useParams()
+  const { professor } = useProfessorData(idProfessor, { profile: true })
   const basePath = `/professor/${idProfessor}`
 
   return (
@@ -44,7 +42,7 @@ function ProfessorShell() {
           </NavLink>
           <div className="text-right">
             <span className="block text-sm font-semibold text-slate-900">
-              {professor.nome}
+              {professor?.nome || `Professor #${idProfessor}`}
             </span>
             <span className="block text-xs text-slate-500">Professor</span>
           </div>
@@ -78,15 +76,5 @@ function ProfessorShell() {
         <Outlet />
       </main>
     </div>
-  )
-}
-
-export function ProfessorLayout() {
-  const { idProfessor } = useParams()
-
-  return (
-    <ProfessorProvider idProfessor={idProfessor}>
-      <ProfessorShell />
-    </ProfessorProvider>
   )
 }

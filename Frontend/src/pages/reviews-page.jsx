@@ -1,6 +1,8 @@
 import { MessageSquareText, ShoppingBag, Star } from 'lucide-react'
 import { useState } from 'react'
+import { useParams } from 'react-router-dom'
 
+import { DataError, DataLoading } from '@/components/data-state'
 import { PageHeading } from '@/components/page-heading'
 import {
   Accordion,
@@ -12,8 +14,9 @@ import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
-import { useProfessor } from '@/context/professor-context'
+import { useProfessorData } from '@/hooks/use-professor-data'
 import { formatSales } from '@/lib/format'
+import { api } from '@/services/api'
 
 function RatingStars({ rating }) {
   return (
@@ -33,7 +36,8 @@ function RatingStars({ rating }) {
 }
 
 export function ReviewsPage() {
-  const { lessons, apiClient } = useProfessor()
+  const { idProfessor } = useParams()
+  const { lessons, loading, error, refresh } = useProfessorData(idProfessor)
   const [reviewsByLesson, setReviewsByLesson] = useState({})
   const [loadingLesson, setLoadingLesson] = useState(null)
   const [errorByLesson, setErrorByLesson] = useState({})
@@ -45,7 +49,7 @@ export function ReviewsPage() {
     setLoadingLesson(idVideoLesson)
 
     try {
-      const response = await apiClient.getVideoLessonReviews(idVideoLesson)
+      const response = await api.getVideoLessonReviews(idVideoLesson)
       setReviewsByLesson((current) => ({
         ...current,
         [idVideoLesson]: response,
@@ -60,6 +64,9 @@ export function ReviewsPage() {
       setLoadingLesson(null)
     }
   }
+
+  if (loading) return <DataLoading />
+  if (error) return <DataError error={error} onRetry={refresh} />
 
   return (
     <>

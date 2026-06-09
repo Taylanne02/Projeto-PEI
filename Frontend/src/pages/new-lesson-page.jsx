@@ -1,17 +1,16 @@
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 
 import { LessonForm } from '@/components/lesson-form'
 import { PageHeading } from '@/components/page-heading'
 import { Card, CardContent } from '@/components/ui/card'
-import { useProfessor } from '@/context/professor-context'
+import { api } from '@/services/api'
 
 export function NewLessonPage() {
-  const { idProfessor, apiClient, refresh } = useProfessor()
+  const { idProfessor } = useParams()
   const navigate = useNavigate()
 
   async function createLesson(data) {
-    await apiClient.createVideoLesson(idProfessor, data)
-    await refresh()
+    await api.createVideoLesson(idProfessor, data)
     navigate(`/professor/${idProfessor}/videoaulas`, {
       state: { success: 'Videoaula publicada com sucesso.' },
     })
