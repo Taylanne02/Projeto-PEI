@@ -55,6 +55,7 @@ npm create vite@latest
 
 ```bash
 npm install
+npm install @tailwindcss/vite tailwindcss
 ```
 
 3. Execute o projeto:
