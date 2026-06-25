@@ -13,8 +13,8 @@ import { cn } from '@/lib/utils'
 
 const navigation = [
   { label: 'Início', path: '', icon: House, end: true },
-  { label: 'Adicionar', path: 'videoaulas/nova', icon: Plus },
-  { label: 'Videoaulas', path: 'videoaulas', icon: BookOpen },
+  { label: 'Adicionar', path: 'videoaulas/nova', icon: Plus, end: true },
+  { label: 'Videoaulas', path: 'videoaulas', icon: BookOpen, end: true },
   { label: 'Avaliações', path: 'avaliacoes', icon: MessageSquareText },
   { label: 'Financeiro', path: 'financeiro', icon: CircleDollarSign },
 ]

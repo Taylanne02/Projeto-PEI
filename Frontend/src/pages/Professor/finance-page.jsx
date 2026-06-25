@@ -1,5 +1,5 @@
 import { Banknote, CircleDollarSign, Percent, TrendingUp } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 
 import { DataError, DataLoading } from '@/components/data-state'
@@ -57,10 +57,10 @@ export function FinancePage() {
   const [withdrawAmount, setWithdrawAmount] = useState('')
   const [withdrawMessage, setWithdrawMessage] = useState('')
   const [withdrawError, setWithdrawError] = useState('')
+  const [withdrawnAmount, setWithdrawnAmount] = useState(0)
+  const [pendingWithdrawal, setPendingWithdrawal] = useState(null)
 
-  if (loading) return <DataLoading />
-  if (error) return <DataError error={error} onRetry={refresh} />
-
+  const availableBalance = Math.max(commissionBalance - withdrawnAmount, 0)
   const financialLessons = lessons.map((lesson) => ({
     ...lesson,
     ...calculateLessonFinance(lesson),
@@ -83,7 +83,7 @@ export function FinancePage() {
       return
     }
 
-    if (amount > commissionBalance) {
+    if (amount > availableBalance) {
       setWithdrawError('O valor solicitado nao pode ser maior que o saldo disponivel.')
       return
     }
@@ -93,8 +93,26 @@ export function FinancePage() {
     setWithdrawMessage(
       `Solicitacao de retirada de ${currency.format(amount)} registrada como pendente.`,
     )
+    setPendingWithdrawal(amount)
     setWithdrawAmount('')
   }
+
+  useEffect(() => {
+    if (!pendingWithdrawal) return undefined
+
+    const timeoutId = window.setTimeout(() => {
+      setWithdrawnAmount((current) => current + pendingWithdrawal)
+      setWithdrawMessage(
+        `${currency.format(pendingWithdrawal)} saiu da conta do professor.`,
+      )
+      setPendingWithdrawal(null)
+    }, 10000)
+
+    return () => window.clearTimeout(timeoutId)
+  }, [pendingWithdrawal])
+
+  if (loading) return <DataLoading />
+  if (error) return <DataError error={error} onRetry={refresh} />
 
   return (
     <>
@@ -106,7 +124,7 @@ export function FinancePage() {
       <section className="grid gap-4 md:grid-cols-3" aria-label="Resumo financeiro">
         <SummaryCard
           label="Saldo disponível"
-          value={currency.format(commissionBalance)}
+          value={currency.format(availableBalance)}
           icon={Banknote}
           testId="commission-balance"
         />
@@ -134,7 +152,9 @@ export function FinancePage() {
       {withdrawMessage && (
         <Alert className="mb-6 border-emerald-200 bg-emerald-50 text-emerald-900">
           <Banknote />
-          <AlertTitle>Retirada solicitada</AlertTitle>
+          <AlertTitle>
+            {pendingWithdrawal ? 'Retirada solicitada' : 'Saldo atualizado'}
+          </AlertTitle>
           <AlertDescription>{withdrawMessage}</AlertDescription>
         </Alert>
       )}
@@ -146,7 +166,7 @@ export function FinancePage() {
         <CardContent className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <p className="font-semibold text-slate-900">
-              Saldo disponivel: {currency.format(commissionBalance)}
+              Saldo disponivel: {currency.format(availableBalance)}
             </p>
             <p className="mt-1 text-sm text-slate-500">
               Este fluxo registra a solicitacao. A integracao bancaria real ainda precisa ser criada no backend.
@@ -157,7 +177,7 @@ export function FinancePage() {
               setWithdrawOpen(true)
               setWithdrawError('')
             }}
-            disabled={commissionBalance <= 0}
+            disabled={availableBalance <= 0 || Boolean(pendingWithdrawal)}
           >
             Solicitar retirada
           </Button>
@@ -237,7 +257,7 @@ export function FinancePage() {
                 placeholder="0,00"
               />
               <p className="text-sm text-slate-500">
-                Maximo disponivel: {currency.format(commissionBalance)}
+                Maximo disponivel: {currency.format(availableBalance)}
               </p>
               {withdrawError && (
                 <p className="text-sm text-destructive">{withdrawError}</p>

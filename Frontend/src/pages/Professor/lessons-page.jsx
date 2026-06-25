@@ -40,6 +40,7 @@ const currency = new Intl.NumberFormat('pt-BR', {
   style: 'currency',
   currency: 'BRL',
 })
+const TUMBLR_HOME_URL = 'https://www.tumblr.com/'
 
 function LessonThumbnail({ lesson }) {
   if (lesson.thumbnailUrl) {
@@ -151,18 +152,16 @@ export function LessonsPage() {
                   <ShoppingBag className="size-4" />
                   {formatSales(lesson.totalVendas)}
                 </div>
-                {lesson.linkTumblr && (
-                  <Button asChild variant="link" className="mt-3 h-auto p-0">
-                    <a
-                      href={lesson.linkTumblr}
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      <ExternalLink className="size-4" />
-                      Abrir link do Tumblr
-                    </a>
-                  </Button>
-                )}
+                <Button asChild variant="link" className="mt-3 h-auto p-0">
+                  <a
+                    href={lesson.linkTumblr || TUMBLR_HOME_URL}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    <ExternalLink className="size-4" />
+                    {lesson.linkTumblr ? 'Abrir link do Tumblr' : 'Abrir Tumblr'}
+                  </a>
+                </Button>
                 <div className="mt-5 flex gap-2">
                   <Button
                     variant="outline"
