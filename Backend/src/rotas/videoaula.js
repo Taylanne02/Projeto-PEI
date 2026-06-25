@@ -7,7 +7,7 @@ const db = require("../database");
   // na hora do Frontend 
 router.post("/validarPublicacao", (req, res) => {
   try {
-    const { titulo, descricao, valor, gratuito, id_professor } = req.body;
+    const { titulo, descricao, valor, gratuito, id_professor, linkTumblr, thumbnailUrl } = req.body;
 
     if (!titulo || !id_professor || gratuito === undefined) {
       return res.status(400).json({ erro: "Título, id_professor e gratuito são obrigatórios" });
@@ -33,6 +33,8 @@ router.post("/validarPublicacao", (req, res) => {
       mensagem: "Videoaula validada com sucesso!",
       titulo,
       descricao: descricao || "",
+      linkTumblr: linkTumblr || "",
+      thumbnailUrl: thumbnailUrl || "",
       gratuito,
       valor: gratuito === "sim" ? 0 : valor,
       id_professor
@@ -49,7 +51,7 @@ router.post("/validarPublicacao", (req, res) => {
 router.put("/:id_videoaula", (req, res) => {
   try {
     const { id_videoaula } = req.params;
-    let { titulo, descricao, valor, gratuito } = req.body;
+    let { titulo, descricao, valor, gratuito, linkTumblr, thumbnailUrl } = req.body;
 
     if (!titulo || gratuito === undefined) {
       return res.status(400).json({ erro: "Título e gratuito são obrigatórios" });
@@ -70,9 +72,9 @@ router.put("/:id_videoaula", (req, res) => {
 
     const resultado = db.prepare(`
       UPDATE videoaula
-      SET titulo = ?, descricao = ?, valor = ?, gratuito = ?
+      SET titulo = ?, descricao = ?, linkTumblr = ?, thumbnailUrl = ?, valor = ?, gratuito = ?
       WHERE id_videoaula = ?
-    `).run(titulo, descricao || "", valor, gratuito, id_videoaula);
+    `).run(titulo, descricao || "", linkTumblr || "", thumbnailUrl || "", valor, gratuito, id_videoaula);
 
     if (resultado.changes === 0) {
       return res.status(404).json({ erro: "Videoaula não encontrada" });
@@ -102,6 +104,8 @@ router.get("/", (req, res) => {
         videoaula.id_videoaula,
         videoaula.titulo,
         videoaula.descricao,
+        videoaula.linkTumblr,
+        videoaula.thumbnailUrl,
         videoaula.valor,
         videoaula.gratuito,
         videoaula.totalVendas,

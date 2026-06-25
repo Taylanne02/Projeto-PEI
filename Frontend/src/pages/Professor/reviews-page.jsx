@@ -1,4 +1,4 @@
-import { MessageSquareText, ShoppingBag, Star } from 'lucide-react'
+import { ImageIcon, MessageSquareText, ShoppingBag, Star } from 'lucide-react'
 import { useState } from 'react'
 import { useParams } from 'react-router-dom'
 
@@ -31,6 +31,24 @@ function RatingStars({ rating }) {
           }`}
         />
       ))}
+    </span>
+  )
+}
+
+function LessonThumbnail({ lesson }) {
+  if (lesson.thumbnailUrl) {
+    return (
+      <img
+        src={lesson.thumbnailUrl}
+        alt={`Thumbnail de ${lesson.titulo}`}
+        className="size-14 rounded-lg object-cover"
+      />
+    )
+  }
+
+  return (
+    <span className="grid size-14 place-items-center rounded-lg bg-indigo-50 text-indigo-500">
+      <ImageIcon className="size-5" />
     </span>
   )
 }
@@ -100,18 +118,21 @@ export function ReviewsPage() {
               >
                 <AccordionTrigger className="hover:no-underline">
                   <div className="flex flex-1 flex-col gap-3 text-left sm:flex-row sm:items-center sm:justify-between">
-                    <div>
-                      <p className="font-semibold text-slate-950">
-                        {lesson.titulo}
-                      </p>
-                      <div className="mt-2 flex flex-wrap items-center gap-3 text-sm text-slate-500">
-                        <span className="flex items-center gap-1.5">
-                          <ShoppingBag className="size-4" />
-                          {formatSales(lesson.totalVendas)}
-                        </span>
-                        <Badge variant={lesson.gratuito ? 'secondary' : 'outline'}>
-                          {lesson.gratuito ? 'Gratuita' : 'Paga'}
-                        </Badge>
+                    <div className="flex items-center gap-3">
+                      <LessonThumbnail lesson={lesson} />
+                      <div>
+                        <p className="font-semibold text-slate-950">
+                          {lesson.titulo}
+                        </p>
+                        <div className="mt-2 flex flex-wrap items-center gap-3 text-sm text-slate-500">
+                          <span className="flex items-center gap-1.5">
+                            <ShoppingBag className="size-4" />
+                            {formatSales(lesson.totalVendas)}
+                          </span>
+                          <Badge variant={lesson.gratuito ? 'secondary' : 'outline'}>
+                            {lesson.gratuito ? 'Gratuita' : 'Paga'}
+                          </Badge>
+                        </div>
                       </div>
                     </div>
                     {reviewData && reviewData.totalAvaliacoes > 0 && (

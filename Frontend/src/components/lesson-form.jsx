@@ -15,6 +15,10 @@ export function LessonForm({
 }) {
   const [title, setTitle] = useState(initialValues.titulo || '')
   const [description, setDescription] = useState(initialValues.descricao || '')
+  const [tumblrLink, setTumblrLink] = useState(initialValues.linkTumblr || '')
+  const [thumbnailUrl, setThumbnailUrl] = useState(
+    initialValues.thumbnailUrl || '',
+  )
   const [free, setFree] = useState(Boolean(initialValues.gratuito))
   const [price, setPrice] = useState(
     initialValues.gratuito ? '' : String(initialValues.valor || ''),
@@ -49,6 +53,8 @@ export function LessonForm({
       await onSubmit({
         titulo: title.trim(),
         descricao: description.trim(),
+        linkTumblr: tumblrLink.trim(),
+        thumbnailUrl: thumbnailUrl.trim(),
         gratuito: free ? 'sim' : 'não',
         valor: free ? 0 : numericPrice,
       })
@@ -90,6 +96,34 @@ export function LessonForm({
           placeholder="Explique o conteúdo e os objetivos da videoaula."
           rows={5}
         />
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="lesson-tumblr">Link do Tumblr</Label>
+        <Input
+          id="lesson-tumblr"
+          type="url"
+          value={tumblrLink}
+          onChange={(event) => setTumblrLink(event.target.value)}
+          placeholder="https://seu-tumblr.tumblr.com/post/..."
+        />
+        <p className="text-sm text-slate-500">
+          Link externo usado para direcionar os alunos para o conteudo da aula.
+        </p>
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="lesson-thumbnail">Thumbnail da videoaula</Label>
+        <Input
+          id="lesson-thumbnail"
+          type="url"
+          value={thumbnailUrl}
+          onChange={(event) => setThumbnailUrl(event.target.value)}
+          placeholder="https://exemplo.com/imagem-da-aula.jpg"
+        />
+        <p className="text-sm text-slate-500">
+          Se ficar vazio, a tela usa uma imagem placeholder automaticamente.
+        </p>
       </div>
 
       <div className="flex items-center justify-between gap-4 rounded-xl border bg-slate-50 p-4">

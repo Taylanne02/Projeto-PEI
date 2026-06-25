@@ -6,7 +6,7 @@ const db = require("../database");
 router.post("/:id_professor/videoaula", (req, res) => {
   try {
     const { id_professor } = req.params;
-    let { titulo, descricao, valor, gratuito } = req.body;
+    let { titulo, descricao, valor, gratuito, linkTumblr, thumbnailUrl } = req.body;
 
     if (!titulo || gratuito === undefined) {
       return res.status(400).json({ erro: "Título e gratuito são obrigatórios" });
@@ -34,9 +34,17 @@ router.post("/:id_professor/videoaula", (req, res) => {
     }
 
     const resultado = db.prepare(`
-      INSERT INTO videoaula (id_professor, titulo, descricao, valor, gratuito)
-      VALUES (?, ?, ?, ?, ?)
-    `).run(id_professor, titulo, descricao || "", valor, gratuito);
+      INSERT INTO videoaula (id_professor, titulo, descricao, linkTumblr, thumbnailUrl, valor, gratuito)
+      VALUES (?, ?, ?, ?, ?, ?, ?)
+    `).run(
+      id_professor,
+      titulo,
+      descricao || "",
+      linkTumblr || "",
+      thumbnailUrl || "",
+      valor,
+      gratuito
+    );
 
     res.status(201).json({
       mensagem: "Videoaula adicionada com sucesso!",
@@ -55,7 +63,7 @@ router.post("/:id_professor/videoaula", (req, res) => {
 router.put("/videoaula/:id_videoaula", (req, res) => {
   try {
     const { id_videoaula } = req.params;
-    let { titulo, descricao, valor, gratuito } = req.body;
+    let { titulo, descricao, valor, gratuito, linkTumblr, thumbnailUrl } = req.body;
 
     if (!titulo || gratuito === undefined) {
       return res.status(400).json({ erro: "Título e gratuito são obrigatórios" });
@@ -76,9 +84,17 @@ router.put("/videoaula/:id_videoaula", (req, res) => {
 
     const resultado = db.prepare(`
       UPDATE videoaula
-      SET titulo = ?, descricao = ?, valor = ?, gratuito = ?
+      SET titulo = ?, descricao = ?, linkTumblr = ?, thumbnailUrl = ?, valor = ?, gratuito = ?
       WHERE id_videoaula = ?
-    `).run(titulo, descricao || "", valor, gratuito, id_videoaula);
+    `).run(
+      titulo,
+      descricao || "",
+      linkTumblr || "",
+      thumbnailUrl || "",
+      valor,
+      gratuito,
+      id_videoaula
+    );
 
     if (resultado.changes === 0) {
       return res.status(404).json({ erro: "Videoaula não encontrada" });
@@ -126,6 +142,9 @@ router.get("/:id_professor/vendas", (req, res) => {
       SELECT 
         id_videoaula,
         titulo,
+        descricao,
+        linkTumblr,
+        thumbnailUrl,
         valor,
         gratuito,
         totalVendas

@@ -1,4 +1,4 @@
-import { Pencil, Plus, ShoppingBag, Trash2 } from 'lucide-react'
+import { ExternalLink, ImageIcon, Pencil, Plus, ShoppingBag, Trash2 } from 'lucide-react'
 import { useState } from 'react'
 import { Link, useLocation, useParams } from 'react-router-dom'
 
@@ -40,6 +40,24 @@ const currency = new Intl.NumberFormat('pt-BR', {
   style: 'currency',
   currency: 'BRL',
 })
+
+function LessonThumbnail({ lesson }) {
+  if (lesson.thumbnailUrl) {
+    return (
+      <img
+        src={lesson.thumbnailUrl}
+        alt={`Thumbnail de ${lesson.titulo}`}
+        className="h-36 w-full rounded-t-xl object-cover"
+      />
+    )
+  }
+
+  return (
+    <div className="grid h-36 place-items-center rounded-t-xl bg-gradient-to-br from-indigo-50 to-slate-100 text-indigo-500">
+      <ImageIcon className="size-10" />
+    </div>
+  )
+}
 
 export function LessonsPage() {
   const { idProfessor } = useParams()
@@ -112,6 +130,7 @@ export function LessonsPage() {
         <div className="grid gap-4 lg:grid-cols-2">
           {orderedLessons.map((lesson) => (
             <Card key={lesson.id_videoaula} data-testid="managed-lesson">
+              <LessonThumbnail lesson={lesson} />
               <CardHeader>
                 <div className="flex items-start justify-between gap-4">
                   <div>
@@ -132,6 +151,18 @@ export function LessonsPage() {
                   <ShoppingBag className="size-4" />
                   {formatSales(lesson.totalVendas)}
                 </div>
+                {lesson.linkTumblr && (
+                  <Button asChild variant="link" className="mt-3 h-auto p-0">
+                    <a
+                      href={lesson.linkTumblr}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      <ExternalLink className="size-4" />
+                      Abrir link do Tumblr
+                    </a>
+                  </Button>
+                )}
                 <div className="mt-5 flex gap-2">
                   <Button
                     variant="outline"

@@ -2,6 +2,7 @@ import {
   ArrowRight,
   BookOpen,
   CircleDollarSign,
+  ImageIcon,
   MessageSquareText,
   Plus,
   ShoppingBag,
@@ -68,6 +69,24 @@ function StatCard({ label, value, icon: Icon }) {
         </span>
       </CardContent>
     </Card>
+  )
+}
+
+function LessonPreviewThumbnail({ lesson }) {
+  if (lesson.thumbnailUrl) {
+    return (
+      <img
+        src={lesson.thumbnailUrl}
+        alt={`Thumbnail de ${lesson.titulo}`}
+        className="size-16 rounded-xl object-cover"
+      />
+    )
+  }
+
+  return (
+    <span className="grid size-16 place-items-center rounded-xl bg-indigo-50 text-indigo-500">
+      <ImageIcon className="size-6" />
+    </span>
   )
 }
 
@@ -169,13 +188,16 @@ export function DashboardPage() {
             topLessons.map((lesson) => (
               <Card key={lesson.id_videoaula} data-testid="lesson-preview">
                 <CardContent className="flex items-center justify-between gap-4 p-5">
-                  <div>
-                    <p className="font-semibold text-slate-900">
-                      {lesson.titulo}
-                    </p>
-                    <p className="mt-1 text-sm text-slate-500">
-                      {formatSales(lesson.totalVendas)}
-                    </p>
+                  <div className="flex items-center gap-4">
+                    <LessonPreviewThumbnail lesson={lesson} />
+                    <div>
+                      <p className="font-semibold text-slate-900">
+                        {lesson.titulo}
+                      </p>
+                      <p className="mt-1 text-sm text-slate-500">
+                        {formatSales(lesson.totalVendas)}
+                      </p>
+                    </div>
                   </div>
                   <Badge variant={lesson.gratuito ? 'secondary' : 'outline'}>
                     {lesson.gratuito

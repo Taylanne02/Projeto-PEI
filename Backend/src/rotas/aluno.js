@@ -10,6 +10,8 @@ router.get("/videoaulas", (req, res) => {
         videoaula.id_videoaula,
         videoaula.titulo,
         videoaula.descricao,
+        videoaula.linkTumblr,
+        videoaula.thumbnailUrl,
         videoaula.valor,
         videoaula.gratuito,
         videoaula.totalVendas,

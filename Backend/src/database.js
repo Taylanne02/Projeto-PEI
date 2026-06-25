@@ -46,6 +46,8 @@ db.exec(`
             id_professor INTEGER NOT NULL,
             titulo TEXT NOT NULL,
             descricao TEXT,
+            linkTumblr TEXT,
+            thumbnailUrl TEXT,
             valor REAL NOT NULL,
             gratuito INTEGER NOT NULL CHECK (gratuito IN (0, 1)),
             totalVendas INTEGER DEFAULT 0,
@@ -54,6 +56,19 @@ db.exec(`
             FOREIGN KEY (id_professor) REFERENCES professor(id_professor)
         )
     `);
+
+const videoaulaColumns = db
+    .prepare("PRAGMA table_info(videoaula)")
+    .all()
+    .map((column) => column.name);
+
+if (!videoaulaColumns.includes('linkTumblr')) {
+    db.exec("ALTER TABLE videoaula ADD COLUMN linkTumblr TEXT");
+}
+
+if (!videoaulaColumns.includes('thumbnailUrl')) {
+    db.exec("ALTER TABLE videoaula ADD COLUMN thumbnailUrl TEXT");
+}
 
     //pagamento
 db.exec(`
