@@ -1,0 +1,5 @@
+@import '../Login/Login.css';
+
+.cadastro-card {
+  max-width: 500px;
+}
