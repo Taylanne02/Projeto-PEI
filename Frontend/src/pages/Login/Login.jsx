@@ -45,8 +45,9 @@ export default function Login() {
       if (data.usuario.tipoUsuario === 'professor') {
         navigate(`/professor/${data.usuario.id_professor}`)
       } else {
-        navigate('/')
+        navigate(`/aluno/${data.usuario.id_aluno}`)
       }
+
     } catch (error) {
       setMensagem('Erro ao conectar com o servidor.')
     }
