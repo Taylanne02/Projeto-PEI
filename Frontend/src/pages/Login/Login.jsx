@@ -43,7 +43,7 @@ export default function Login() {
       localStorage.setItem('usuario', JSON.stringify(data.usuario))
 
       if (data.usuario.tipoUsuario === 'professor') {
-        navigate(`/professor/${data.usuario.id_usuario}`)
+        navigate(`/professor/${data.usuario.id_professor}`)
       } else {
         navigate('/')
       }

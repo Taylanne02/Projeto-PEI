@@ -2,8 +2,7 @@ const express = require("express");
 const router = express.Router();
 const db = require("../database");
 
-//POST- Cadastrar usuário, já salva automaticamento no banco de dados, 
-//tanto para professor quanto para aluno, dependendo do tipoUsuario selecionado
+// CADASTRAR USUÁRIO
 router.post("/", (req, res) => {
   try {
     const { nome, email, senha, cpf, tipoUsuario } = req.body;
@@ -31,23 +30,32 @@ router.post("/", (req, res) => {
 
     const id_usuario = resultado.lastInsertRowid;
 
+    let id_professor = null;
+    let id_aluno = null;
+
     if (tipoUsuario === "professor") {
-      db.prepare(`
+      const professor = db.prepare(`
         INSERT INTO professor (id_usuario, foto, biografia, saldoComissao, listaVideoAulas)
         VALUES (?, ?, ?, ?, ?)
       `).run(id_usuario, "", "", 0, "");
+
+      id_professor = professor.lastInsertRowid;
     }
 
     if (tipoUsuario === "aluno") {
-      db.prepare(`
+      const aluno = db.prepare(`
         INSERT INTO aluno (id_usuario, historicoCompras, formaPagamento)
         VALUES (?, ?, ?)
       `).run(id_usuario, "", "");
+
+      id_aluno = aluno.lastInsertRowid;
     }
 
     res.status(201).json({
       mensagem: "Usuário cadastrado com sucesso!",
       id_usuario,
+      id_professor,
+      id_aluno,
       tipoUsuario
     });
 
@@ -57,7 +65,7 @@ router.post("/", (req, res) => {
   }
 });
 
-// POST- Login do usuário
+// LOGIN DO USUÁRIO
 router.post("/login", (req, res) => {
   try {
     const { email, senha } = req.body;
@@ -74,9 +82,27 @@ router.post("/login", (req, res) => {
       return res.status(404).json({ erro: "Email ou senha inválidos" });
     }
 
+    let dadosPerfil = null;
+
+    if (usuario.tipoUsuario === "professor") {
+      dadosPerfil = db
+        .prepare("SELECT * FROM professor WHERE id_usuario = ?")
+        .get(usuario.id_usuario);
+    }
+
+    if (usuario.tipoUsuario === "aluno") {
+      dadosPerfil = db
+        .prepare("SELECT * FROM aluno WHERE id_usuario = ?")
+        .get(usuario.id_usuario);
+    }
+
     res.status(200).json({
       mensagem: "Login realizado com sucesso!",
-      usuario
+      usuario: {
+        ...usuario,
+        id_professor: dadosPerfil?.id_professor,
+        id_aluno: dadosPerfil?.id_aluno,
+      },
     });
 
   } catch (erro) {
@@ -85,8 +111,7 @@ router.post("/login", (req, res) => {
   }
 });
 
-
-// PUT- Editar perfil do usuário
+// EDITAR PERFIL DO USUÁRIO
 router.put("/:id_usuario", (req, res) => {
   try {
     const { id_usuario } = req.params;
