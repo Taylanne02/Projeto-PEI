@@ -3,10 +3,11 @@ import {
   CircleDollarSign,
   GraduationCap,
   House,
+  LogOut,
   MessageSquareText,
   Plus,
 } from 'lucide-react'
-import { NavLink, Outlet, useParams } from 'react-router-dom'
+import { NavLink, Outlet, useNavigate, useParams } from 'react-router-dom'
 
 import { useProfessorData } from '@/hooks/use-professor-data'
 import { cn } from '@/lib/utils'
@@ -20,9 +21,15 @@ const navigation = [
 ]
 
 export function ProfessorLayout() {
+  const navigate = useNavigate()
   const { idProfessor } = useParams()
   const { professor } = useProfessorData(idProfessor, { profile: true })
   const basePath = `/professor/${idProfessor}`
+
+  function handleLogout() {
+    localStorage.removeItem('usuario')
+    navigate('/')
+  }
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -35,16 +42,29 @@ export function ProfessorLayout() {
             <span className="grid size-10 place-items-center rounded-xl bg-indigo-600 text-white shadow-sm">
               <GraduationCap className="size-5" />
             </span>
+
             <span>
-              <span className="block text-sm text-indigo-600">PEI Ensino</span>
+              <span className="block text-sm text-indigo-600">NextWork</span>
               <span className="block text-base">Painel do professor</span>
             </span>
           </NavLink>
-          <div className="text-right">
-            <span className="block text-sm font-semibold text-slate-900">
-              {professor?.nome || `Professor #${idProfessor}`}
-            </span>
-            <span className="block text-xs text-slate-500">Professor</span>
+
+          <div className="flex items-center gap-4">
+            <div className="text-right">
+              <span className="block text-sm font-semibold text-slate-900">
+                {professor?.nome || `Professor #${idProfessor}`}
+              </span>
+              <span className="block text-xs text-slate-500">Professor</span>
+            </div>
+
+            <button
+              type="button"
+              onClick={handleLogout}
+              className="flex items-center gap-2 rounded-lg border border-slate-200 px-3 py-2 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-950"
+            >
+              <LogOut className="size-4" />
+              Sair
+            </button>
           </div>
         </div>
       </header>
