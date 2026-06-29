@@ -1,9 +1,54 @@
+import { useState, useEffect } from 'react'
 import { BookOpen, ShoppingBag, Star, User } from 'lucide-react'
 import { Link, useParams } from 'react-router-dom'
+import { api } from '../../services/api'
 
 export function DashboardAlunoPage() {
   const { idAluno } = useParams()
   const usuario = JSON.parse(localStorage.getItem('usuario'))
+  const [stats, setStats] = useState({
+    totalCursos: 0,
+    totalCompras: 0,
+    totalAvaliacoes: 0,
+  })
+  const [carregando, setCarregando] = useState(true)
+
+  useEffect(() => {
+    buscarDados()
+  }, [])
+
+  async function buscarDados() {
+    try {
+      setCarregando(true)
+
+      // Pega o ID do aluno do localStorage se não tiver nos params
+      const alunoId = idAluno || localStorage.getItem('idAluno') || 1
+
+      // Busca todos os cursos
+      const cursos = await api.getAllVideoLessons()
+      
+      // Busca compras do aluno
+      const compras = await api.getStudentPurchases(alunoId)
+      
+      // Busca avaliações do aluno
+      const avaliacoes = await api.getStudentReviews(alunoId)
+
+      setStats({
+        totalCursos: cursos.total || 0,
+        totalCompras: compras.total || 0,
+        totalAvaliacoes: avaliacoes.total || 0,
+      })
+    } catch (e) {
+      console.error('Erro ao buscar dados:', e)
+      setStats({
+        totalCursos: 0,
+        totalCompras: 0,
+        totalAvaliacoes: 0,
+      })
+    } finally {
+      setCarregando(false)
+    }
+  }
 
   return (
     <div>
@@ -18,17 +63,23 @@ export function DashboardAlunoPage() {
       <div className="mt-8 grid gap-4 md:grid-cols-3">
         <div className="rounded-xl border bg-white p-6">
           <p className="text-sm text-slate-600">Cursos disponíveis</p>
-          <h2 className="mt-2 text-2xl font-bold">0 cursos</h2>
+          <h2 className="mt-2 text-2xl font-bold">
+            {carregando ? '...' : stats.totalCursos} curso{stats.totalCursos !== 1 ? 's' : ''}
+          </h2>
         </div>
 
         <div className="rounded-xl border bg-white p-6">
           <p className="text-sm text-slate-600">Compras realizadas</p>
-          <h2 className="mt-2 text-2xl font-bold">0 compras</h2>
+          <h2 className="mt-2 text-2xl font-bold">
+            {carregando ? '...' : stats.totalCompras} compra{stats.totalCompras !== 1 ? 's' : ''}
+          </h2>
         </div>
 
         <div className="rounded-xl border bg-white p-6">
           <p className="text-sm text-slate-600">Avaliações feitas</p>
-          <h2 className="mt-2 text-2xl font-bold">0 avaliações</h2>
+          <h2 className="mt-2 text-2xl font-bold">
+            {carregando ? '...' : stats.totalAvaliacoes} avaliação{stats.totalAvaliacoes !== 1 ? 'ões' : ''}
+          </h2>
         </div>
       </div>
 

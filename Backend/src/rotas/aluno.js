@@ -253,4 +253,76 @@ router.delete("/:id_aluno/cancelar/:id_videoaula", (req, res) => {
   }
 });
 
+// GET - minhasCompras()
+router.get("/:id_aluno/compras", (req, res) => {
+  try {
+    const { id_aluno } = req.params;
+
+    const compras = db.prepare(`
+      SELECT
+        pagamento.id_pagamento,
+        pagamento.valor,
+        pagamento.status,
+        pagamento.dataPagamento,
+        videoaula.id_videoaula,
+        videoaula.titulo,
+        videoaula.descricao,
+        videoaula.thumbnailUrl,
+        videoaula.valor AS precoOriginal,
+        videoaula.gratuito,
+        usuario.nome AS nomeProfessor
+      FROM pagamento
+      INNER JOIN videoaula ON pagamento.id_videoaula = videoaula.id_videoaula
+      INNER JOIN professor ON videoaula.id_professor = professor.id_professor
+      INNER JOIN usuario ON professor.id_usuario = usuario.id_usuario
+      WHERE pagamento.id_aluno = ?
+      AND pagamento.status = 'concluido'
+      ORDER BY pagamento.dataPagamento DESC
+    `).all(id_aluno);
+
+    res.status(200).json({
+      total: compras.length,
+      compras
+    });
+
+  } catch (erro) {
+    console.log(erro);
+    res.status(500).json({ erro: "Erro ao visualizar compras" });
+  }
+});
+
+// GET - minhasAvaliacoes()
+router.get("/:id_aluno/avaliacoes", (req, res) => {
+  try {
+    const { id_aluno } = req.params;
+
+    const avaliacoes = db.prepare(`
+      SELECT
+        avaliacao.id_avaliacao,
+        avaliacao.nota,
+        avaliacao.comentario,
+        videoaula.id_videoaula,
+        videoaula.titulo,
+        videoaula.descricao,
+        videoaula.thumbnailUrl,
+        usuario.nome AS nomeProfessor
+      FROM avaliacao
+      INNER JOIN videoaula ON avaliacao.id_videoaula = videoaula.id_videoaula
+      INNER JOIN professor ON videoaula.id_professor = professor.id_professor
+      INNER JOIN usuario ON professor.id_usuario = usuario.id_usuario
+      WHERE avaliacao.id_aluno = ?
+      ORDER BY avaliacao.id_avaliacao DESC
+    `).all(id_aluno);
+
+    res.status(200).json({
+      total: avaliacoes.length,
+      avaliacoes
+    });
+
+  } catch (erro) {
+    console.log(erro);
+    res.status(500).json({ erro: "Erro ao visualizar avaliações" });
+  }
+});
+
 module.exports = router;

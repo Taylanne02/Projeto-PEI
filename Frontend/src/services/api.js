@@ -59,6 +59,15 @@ export function createApiClient(
     getVideoLessonReviews(idVideoLesson) {
       return request(`/avaliacao/videoaula/${idVideoLesson}`)
     },
+    getAllVideoLessons() {
+      return request('/aluno/videoaulas')
+    },
+    getStudentPurchases(idAluno) {
+      return request(`/aluno/${idAluno}/compras`)
+    },
+    getStudentReviews(idAluno) {
+      return request(`/aluno/${idAluno}/avaliacoes`)
+    },
   }
 }
 
