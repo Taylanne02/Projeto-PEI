@@ -91,3 +91,10 @@
   font-weight: 700;
   text-decoration: none;
 }
+
+.auth-message {
+  margin-top: 16px;
+  text-align: center;
+  color: var(--primary);
+  font-weight: 700;
+}
