@@ -152,16 +152,22 @@ export function LessonsPage() {
                   <ShoppingBag className="size-4" />
                   {formatSales(lesson.totalVendas)}
                 </div>
-                <Button asChild variant="link" className="mt-3 h-auto p-0">
-                  <a
-                    href={lesson.linkTumblr || TUMBLR_HOME_URL}
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    <ExternalLink className="size-4" />
-                    {lesson.linkTumblr ? 'Abrir link do Tumblr' : 'Abrir Tumblr'}
-                  </a>
-                </Button>
+                {lesson.linkTumblr ? (
+                  <Button asChild variant="link" className="mt-3 h-auto p-0">
+                    <a
+                      href={lesson.linkTumblr}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      <ExternalLink className="size-4" />
+                      Abrir vídeo aula
+                    </a>
+                  </Button>
+                ) : (
+                  <p className="mt-3 text-sm text-slate-500">
+                    Nenhum link disponível
+                  </p>
+                )}
                 <div className="mt-5 flex gap-2">
                   <Button
                     variant="outline"
