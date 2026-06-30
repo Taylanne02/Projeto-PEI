@@ -2,10 +2,16 @@
 const express = require("express");
 const cors = require("cors");
 const db = require("./src/database");
+const path = require("path");
 
 // iniciação do servidor 
 const app = express();
 const PORT = 3000;
+
+app.use(
+  "/uploads",
+  express.static(path.join(__dirname, "uploads"))
+);
 
 // middlewares
 app.use(cors({

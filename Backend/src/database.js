@@ -27,6 +27,25 @@ db.exec(`
         )
     `);
 
+        const professorColumns = db
+        .prepare("PRAGMA table_info(professor)")
+        .all()
+        .map((column) => column.name);
+
+        if (!professorColumns.includes('documentoComprovacao')) {
+        db.exec(`
+            ALTER TABLE professor
+            ADD COLUMN documentoComprovacao TEXT
+        `);
+        }
+
+        if (!professorColumns.includes('statusValidacao')) {
+        db.exec(`
+            ALTER TABLE professor
+            ADD COLUMN statusValidacao TEXT DEFAULT 'pendente'
+        `);
+        }
+
     //aluno
 db.exec(`
         CREATE TABLE IF NOT EXISTS aluno(

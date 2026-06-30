@@ -1,6 +1,8 @@
 const express = require("express");
 const router = express.Router();
 const db = require("../database");
+const multer = require("multer");
+const upload = multer();
 
 // CADASTRAR USUÁRIO
 router.post("/", (req, res) => {
@@ -155,6 +157,50 @@ router.put("/:id_usuario", (req, res) => {
   } catch (erro) {
     console.log(erro);
     res.status(500).json({ erro: "Erro ao editar perfil" });
+  }
+});
+
+// DELETAR USUÁRIO
+router.delete("/:id_usuario", (req, res) => {
+  try {
+    const { id_usuario } = req.params;
+
+    const usuario = db
+      .prepare("SELECT * FROM usuario WHERE id_usuario = ?")
+      .get(id_usuario);
+
+    if (!usuario) {
+      return res.status(404).json({
+        erro: "Usuário não encontrado"
+      });
+    }
+
+    if (usuario.tipoUsuario === "professor") {
+      db.prepare(
+        "DELETE FROM professor WHERE id_usuario = ?"
+      ).run(id_usuario);
+    }
+
+    if (usuario.tipoUsuario === "aluno") {
+      db.prepare(
+        "DELETE FROM aluno WHERE id_usuario = ?"
+      ).run(id_usuario);
+    }
+
+    const resultado = db.prepare(
+      "DELETE FROM usuario WHERE id_usuario = ?"
+    ).run(id_usuario);
+
+    res.status(200).json({
+      mensagem: "Usuário removido com sucesso!",
+      linhasRemovidas: resultado.changes
+    });
+
+  } catch (erro) {
+    console.log(erro);
+    res.status(500).json({
+      erro: "Erro ao remover usuário"
+    });
   }
 });
 

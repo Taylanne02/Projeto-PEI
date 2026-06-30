@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const db = require("../database");
+const upload = require("../middleware/upload");
 
 // POST- Adicionar videoaula
 router.post("/:id_professor/videoaula", (req, res) => {
@@ -190,6 +191,69 @@ router.get("/", (req, res) => {
     console.log(erro);
     res.status(500).json({ erro: "Erro ao listar professores" });
   }
+});
+
+// POST- enviar comprovante de professor
+router.post(
+  "/:id_professor/comprovante",
+  upload.single("documento"),
+  (req, res) => {
+    try {
+      const { id_professor } = req.params;
+
+      const professor = db
+        .prepare(
+          "SELECT * FROM professor WHERE id_professor = ?"
+        )
+        .get(id_professor);
+
+      if (!professor) {
+        return res
+          .status(404)
+          .json({ erro: "Professor não encontrado" });
+      }
+
+      if (!req.file) {
+        return res
+          .status(400)
+          .json({ erro: "Arquivo obrigatório" });
+      }
+
+      const caminhoArquivo =
+        "uploads/comprovantes/" + req.file.filename;
+
+      db.prepare(`
+        UPDATE professor
+        SET documentoComprovacao = ?,
+            statusValidacao = 'pendente'
+        WHERE id_professor = ?
+      `).run(caminhoArquivo, id_professor);
+
+      res.status(200).json({
+        mensagem: "Comprovante enviado com sucesso",
+        arquivo: caminhoArquivo,
+      });
+
+    } catch (erro) {
+      console.log(erro);
+      res.status(500).json({
+        erro: "Erro ao enviar comprovante",
+      });
+    }
+  }
+);
+
+// PUT- Aprovar professor
+router.put("/:id_professor/aprovar", (req, res) => {
+  db.prepare(`
+    UPDATE professor
+    SET statusValidacao = 'aprovado'
+    WHERE id_professor = ?
+  `).run(req.params.id_professor);
+
+  res.json({
+    mensagem: "Professor aprovado"
+  });
 });
 
 module.exports = router;

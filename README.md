@@ -32,6 +32,7 @@ npm init -y
 ```bash
 npm install express
 npm install better-sqlite3
+npm install multer
 npm install eslint --save-dev
 ```
 

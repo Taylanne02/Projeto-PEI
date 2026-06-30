@@ -5,6 +5,8 @@ import './Cadastro.css'
 export default function Cadastro() {
   const navigate = useNavigate()
 
+  const [arquivo, setArquivo] = useState(null);
+
   const [form, setForm] = useState({
     nome: '',
     email: '',
@@ -25,33 +27,62 @@ export default function Cadastro() {
   }
 
   async function handleSubmit(event) {
-    event.preventDefault()
+  event.preventDefault();
 
-    try {
-      const response = await fetch('http://localhost:3000/usuario', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(form),
-      })
-
-      const data = await response.json()
-
-      if (!response.ok) {
-        setMensagem(data.erro || 'Erro ao cadastrar usuário.')
-        return
-      }
-
-      setMensagem('Cadastro realizado com sucesso!')
-
-      setTimeout(() => {
-        navigate('/login')
-      }, 1000)
-    } catch (error) {
-      setMensagem('Erro ao conectar com o servidor.')
+  if (form.tipoUsuario === "professor" && !arquivo) {
+      setMensagem("Professor precisa enviar o documento obrigatório.");
+      return;
     }
+
+  try {
+    const formData = new FormData();
+
+    formData.append("nome", form.nome);
+    formData.append("email", form.email);
+    formData.append("senha", form.senha);
+    formData.append("cpf", form.cpf);
+    formData.append("tipoUsuario", form.tipoUsuario);
+
+
+    const response = await fetch(
+      "http://localhost:3000/usuario",
+      {
+        method: "POST",
+        body: formData,
+      }
+    );
+
+    const data = await response.json();
+
+    if (arquivo && data.id_professor) {
+  const formData = new FormData();
+
+  formData.append("documento", arquivo);
+
+  await fetch(
+    `http://localhost:3000/professor/${data.id_professor}/comprovante`,
+    {
+      method: "POST",
+      body: formData,
+    }
+  );
+}
+
+    if (!response.ok) {
+      setMensagem(data.erro || "Erro ao cadastrar usuário.");
+      return;
+    }
+
+    setMensagem("Cadastro realizado com sucesso!");
+
+    setTimeout(() => {
+      navigate("/login");
+    }, 1000);
+
+  } catch (error) {
+    setMensagem("Erro ao conectar com o servidor.");
   }
+}
 
   return (
     <main className="auth-page">
@@ -110,6 +141,18 @@ export default function Cadastro() {
               <option value="professor">Professor</option>
             </select>
           </label>
+
+          {form.tipoUsuario === "professor" && (
+            <label>
+              Documento Obrigatorio
+
+              <input
+                type="file"
+                accept=".pdf,.jpg,.jpeg,.png"
+                onChange={(e) => setArquivo(e.target.files[0])}
+              />
+            </label>
+          )}
 
           <label>
             Senha
