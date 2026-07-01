@@ -48,7 +48,8 @@ router.get("/professor/:id_professor", (req, res) => {
         professor.foto,
         professor.biografia,
         professor.saldoComissao,
-        professor.listaVideoAulas
+        professor.listaVideoAulas,
+        professor.statusValidacao
       FROM professor
       INNER JOIN usuario ON professor.id_usuario = usuario.id_usuario
       WHERE professor.id_professor = ?
@@ -133,7 +134,7 @@ router.post("/:id_aluno/comprar/:id_videoaula", (req, res) => {
       id_videoaula,
       valorFinal,
       "concluido",
-      new Date().toLocaleString("pt-BR")
+      new Date().toISOString()
     );
 
     db.prepare(`
@@ -268,6 +269,7 @@ router.get("/:id_aluno/compras", (req, res) => {
         videoaula.titulo,
         videoaula.descricao,
         videoaula.thumbnailUrl,
+        videoaula.linkTumblr,
         videoaula.valor AS precoOriginal,
         videoaula.gratuito,
         usuario.nome AS nomeProfessor

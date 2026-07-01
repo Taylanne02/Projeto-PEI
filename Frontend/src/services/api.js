@@ -59,14 +59,43 @@ export function createApiClient(
     getVideoLessonReviews(idVideoLesson) {
       return request(`/avaliacao/videoaula/${idVideoLesson}`)
     },
+    createReview(data) {
+      return request('/avaliacao', {
+        method: 'POST',
+        body: JSON.stringify(data),
+      })
+    },
+    updateReview(idAvaliacao, data) {
+      return request(`/avaliacao/${idAvaliacao}`, {
+        method: 'PUT',
+        body: JSON.stringify(data),
+      })
+    },
+    deleteReview(idAvaliacao) {
+      return request(`/avaliacao/${idAvaliacao}`, {
+        method: 'DELETE',
+      })
+    },
     getAllVideoLessons() {
       return request('/aluno/videoaulas')
+    },
+    buyVideoLesson(idAluno, idVideoLesson, formaPagamento) {
+      return request(`/aluno/${idAluno}/comprar/${idVideoLesson}`, {
+        method: 'POST',
+        body: JSON.stringify({ formaPagamento }),
+      })
     },
     getStudentPurchases(idAluno) {
       return request(`/aluno/${idAluno}/compras`)
     },
     getStudentReviews(idAluno) {
       return request(`/aluno/${idAluno}/avaliacoes`)
+    },
+    updateUserProfile(idUsuario, data) {
+      return request(`/usuario/${idUsuario}`, {
+        method: 'PATCH',
+        body: JSON.stringify(data),
+      })
     },
   }
 }

@@ -13,11 +13,11 @@ router.post("/:id_professor/videoaula", (req, res) => {
       return res.status(400).json({ erro: "Título e gratuito são obrigatórios" });
     }
 
-    const professorExiste = db
+    const professor = db
       .prepare("SELECT * FROM professor WHERE id_professor = ?")
       .get(id_professor);
 
-    if (!professorExiste) {
+    if (!professor) {
       return res.status(404).json({ erro: "Professor não encontrado" });
     }
 
@@ -32,6 +32,12 @@ router.post("/:id_professor/videoaula", (req, res) => {
       }
     } else {
       return res.status(400).json({ erro: "Gratuito deve ser sim ou não" });
+    }
+
+    if (professor.statusValidacao === 'pendente' && gratuito === 0) {
+      return res.status(400).json({
+        erro: "Professores pendentes só podem publicar videoaulas gratuitas"
+      });
     }
 
     const resultado = db.prepare(`

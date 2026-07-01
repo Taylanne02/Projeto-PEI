@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
@@ -12,6 +12,7 @@ export function LessonForm({
   submitLabel,
   onSubmit,
   onCancel,
+  canPublishPaid = true,
 }) {
   const [title, setTitle] = useState(initialValues.titulo || '')
   const [description, setDescription] = useState(initialValues.descricao || '')
@@ -27,6 +28,13 @@ export function LessonForm({
   const [requestError, setRequestError] = useState('')
   const [submitting, setSubmitting] = useState(false)
 
+  useEffect(() => {
+    if (!canPublishPaid && !free) {
+      setFree(true)
+      setPrice('')
+    }
+  }, [canPublishPaid, free])
+
   async function handleSubmit(event) {
     event.preventDefault()
     const nextErrors = {}
@@ -36,7 +44,10 @@ export function LessonForm({
       nextErrors.title = 'Informe o título da videoaula.'
     }
 
-    if (!free && (!price || numericPrice <= 0)) {
+    if (!canPublishPaid && !free) {
+      nextErrors.price =
+        'Professores pendentes só podem publicar videoaulas gratuitas.'
+    } else if (!free && (!price || numericPrice <= 0)) {
       nextErrors.price = 'Informe um valor maior que zero.'
     }
 
@@ -132,12 +143,22 @@ export function LessonForm({
           <p className="mt-1 text-sm text-slate-500">
             Quando ativa, nenhum valor será cobrado dos alunos.
           </p>
+          {!canPublishPaid && (
+            <p className="mt-2 text-sm font-medium text-orange-700">
+              Seu cadastro está pendente de validação. Apenas videoaulas
+              gratuitas podem ser publicadas enquanto aguarda aprovação.
+            </p>
+          )}
         </div>
         <Switch
           id="lesson-free"
           aria-label="Videoaula gratuita"
           checked={free}
+          disabled={!canPublishPaid}
           onCheckedChange={(checked) => {
+            if (!canPublishPaid) {
+              return
+            }
             setFree(checked)
             if (checked) setPrice('')
           }}

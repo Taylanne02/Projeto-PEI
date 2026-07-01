@@ -116,6 +116,20 @@ export function DashboardPage() {
         title={`Olá, ${professor.nome}`}
         description="Acompanhe seus resultados e acesse as principais áreas do painel."
       />
+      <div className="mt-4 rounded-2xl border border-slate-200 bg-white p-4">
+        <p className="text-sm font-medium text-slate-500">Status de validação</p>
+        <p className="mt-2 text-lg font-semibold text-slate-900">
+          {professor.statusValidacao === 'pendente'
+            ? 'Aguardando aprovação'
+            : 'Aprovado'}
+        </p>
+        {professor.statusValidacao === 'pendente' && (
+          <p className="mt-2 text-sm text-orange-700">
+            Enquanto seu cadastro está pendente, você só pode publicar
+            videoaulas gratuitas.
+          </p>
+        )}
+      </div>
 
       <section className="grid gap-4 md:grid-cols-3" aria-label="Indicadores">
         <StatCard

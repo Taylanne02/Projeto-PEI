@@ -13,7 +13,7 @@ import { DashboardAlunoPage } from '@/pages/Aluno/dashboard-aluno-page'
 import { CursosPage } from '@/pages/Aluno/cursos-page'
 import { ComprasPage } from '@/pages/Aluno/compras-page'
 import { AvaliacoesAlunoPage } from '@/pages/Aluno/avaliacoes-aluno-page'
-import { PerfilAlunoPage } from '@/pages/Aluno/perfil-aluno-page'
+import { PerfilPage } from '@/pages/Aluno/perfil-aluno-page'
 
 import Home from '@/pages/Home/Home'
 import Login from '@/pages/Login/Login'
@@ -35,6 +35,7 @@ export function AppRoutes() {
         <Route path="videoaulas" element={<LessonsPage />} />
         <Route path="avaliacoes" element={<ReviewsPage />} />
         <Route path="financeiro" element={<FinancePage />} />
+        <Route path="perfil" element={<PerfilPage />} />
       </Route>
 
       <Route path="/aluno/:idAluno" element={<AlunoLayout />}>
@@ -42,7 +43,7 @@ export function AppRoutes() {
         <Route path="cursos" element={<CursosPage />} />
         <Route path="compras" element={<ComprasPage />} />
         <Route path="avaliacoes" element={<AvaliacoesAlunoPage />} />
-        <Route path="perfil" element={<PerfilAlunoPage />} />
+        <Route path="perfil" element={<PerfilPage />} />
       </Route>
 
       <Route path="*" element={<NotFoundPage />} />

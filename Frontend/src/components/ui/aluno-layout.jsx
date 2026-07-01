@@ -10,11 +10,12 @@ import {
 import { NavLink, Outlet, useNavigate, useParams } from 'react-router-dom'
 
 import { cn } from '@/lib/utils'
+import { useUser } from '@/contexts/user-context'
 
 const navigation = [
   { label: 'Início', path: '', icon: House, end: true },
   { label: 'Cursos', path: 'cursos', icon: BookOpen },
-  { label: 'Minhas compras', path: 'compras', icon: ShoppingBag },
+  { label: 'Minhas aulas', path: 'compras', icon: ShoppingBag },
   { label: 'Avaliações', path: 'avaliacoes', icon: Star },
   { label: 'Meu perfil', path: 'perfil', icon: User },
 ]
@@ -23,12 +24,12 @@ export function AlunoLayout() {
   const navigate = useNavigate()
   const { idAluno } = useParams()
 
-  const usuario = JSON.parse(localStorage.getItem('usuario'))
+  const { usuario, setUsuario } = useUser()
 
   const basePath = `/aluno/${idAluno}`
 
   function handleLogout() {
-    localStorage.removeItem('usuario')
+    setUsuario(null)
     navigate('/')
   }
 

@@ -2,10 +2,11 @@ import { useState, useEffect } from 'react'
 import { BookOpen, ShoppingBag, Star, User } from 'lucide-react'
 import { Link, useParams } from 'react-router-dom'
 import { api } from '../../services/api'
+import { useUser } from '@/contexts/user-context'
 
 export function DashboardAlunoPage() {
   const { idAluno } = useParams()
-  const usuario = JSON.parse(localStorage.getItem('usuario'))
+  const { usuario } = useUser()
   const [stats, setStats] = useState({
     totalCursos: 0,
     totalCompras: 0,

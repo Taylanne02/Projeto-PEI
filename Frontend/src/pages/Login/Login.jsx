@@ -1,9 +1,11 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { useUser } from '@/contexts/user-context'
 import './Login.css'
 
 export default function Login() {
   const navigate = useNavigate()
+  const { setUsuario } = useUser()
 
   const [form, setForm] = useState({
     email: '',
@@ -40,7 +42,7 @@ export default function Login() {
         return
       }
 
-      localStorage.setItem('usuario', JSON.stringify(data.usuario))
+      setUsuario(data.usuario)
 
       if (data.usuario.tipoUsuario === 'professor') {
         navigate(`/professor/${data.usuario.id_professor}`)

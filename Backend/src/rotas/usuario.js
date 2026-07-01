@@ -113,50 +113,118 @@ router.post("/login", (req, res) => {
   }
 });
 
-// EDITAR PERFIL DO USUÁRIO
-router.put("/:id_usuario", (req, res) => {
+// EDITAR PARCIALMENTE O PERFIL DO USUÁRIO
+router.patch("/:id_usuario", (req, res) => {
   try {
     const { id_usuario } = req.params;
-    const { nome, email, senha, cpf } = req.body;
+    const { nome, email, cpf, senhaAtual, senhaNova } = req.body;
 
-    if (!nome || !email || !senha || !cpf) {
-      return res.status(400).json({ erro: "Todos os campos são obrigatórios" });
+    if (!senhaAtual) {
+      return res.status(400).json({
+        erro: "Senha de confirmação é obrigatória"
+      });
     }
 
-    const usuarioExiste = db
+    const usuario = db
       .prepare("SELECT * FROM usuario WHERE id_usuario = ?")
       .get(id_usuario);
 
-    if (!usuarioExiste) {
-      return res.status(404).json({ erro: "Usuário não encontrado" });
+    if (!usuario) {
+      return res.status(404).json({
+        erro: "Usuário não encontrado"
+      });
     }
 
-    const emailCpfExiste = db
-      .prepare(`
-        SELECT * FROM usuario
-        WHERE (email = ? OR cpf = ?)
-        AND id_usuario != ?
-      `)
-      .get(email, cpf, id_usuario);
-
-    if (emailCpfExiste) {
-      return res.status(400).json({ erro: "Email ou CPF já está sendo usado por outro usuário" });
+    if (usuario.senha !== senhaAtual) {
+      return res.status(400).json({
+        erro: "Senha de confirmação inválida"
+      });
     }
+
+    const campos = [];
+    const valores = [];
+
+    if (nome) {
+      campos.push("nome = ?");
+      valores.push(nome);
+    }
+
+    if (email) {
+      const emailExiste = db
+        .prepare(`
+          SELECT * FROM usuario
+          WHERE email = ?
+          AND id_usuario != ?
+        `)
+        .get(email, id_usuario);
+
+      if (emailExiste) {
+        return res.status(400).json({
+          erro: "Email já cadastrado"
+        });
+      }
+
+      campos.push("email = ?");
+      valores.push(email);
+    }
+
+    if (cpf) {
+      const cpfExiste = db
+        .prepare(`
+          SELECT * FROM usuario
+          WHERE cpf = ?
+          AND id_usuario != ?
+        `)
+        .get(cpf, id_usuario);
+
+      if (cpfExiste) {
+        return res.status(400).json({
+          erro: "CPF já cadastrado"
+        });
+      }
+
+      campos.push("cpf = ?");
+      valores.push(cpf);
+    }
+
+    if (senhaNova) {
+      campos.push("senha = ?");
+      valores.push(senhaNova);
+    }
+
+    if (campos.length === 0) {
+      return res.status(400).json({
+        erro: "Nenhum campo enviado para atualização"
+      });
+    }
+
+    valores.push(id_usuario);
 
     const resultado = db.prepare(`
       UPDATE usuario
-      SET nome = ?, email = ?, senha = ?, cpf = ?
+      SET ${campos.join(", ")}
       WHERE id_usuario = ?
-    `).run(nome, email, senha, cpf, id_usuario);
+    `).run(...valores);
+
+    const usuarioAtualizado = db.prepare("SELECT * FROM usuario WHERE id_usuario = ?").get(id_usuario);
 
     res.status(200).json({
       mensagem: "Perfil atualizado com sucesso!",
+      usuario: {
+        id_usuario: usuarioAtualizado.id_usuario,
+        nome: usuarioAtualizado.nome,
+        email: usuarioAtualizado.email,
+        cpf: usuarioAtualizado.cpf,
+        tipoUsuario: usuarioAtualizado.tipoUsuario,
+      },
       linhasAlteradas: resultado.changes
     });
 
   } catch (erro) {
     console.log(erro);
-    res.status(500).json({ erro: "Erro ao editar perfil" });
+    res.status(500).json({
+      erro: "Erro ao atualizar perfil"
+    });
   }
 });
 

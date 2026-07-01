@@ -6,14 +6,18 @@ import {
   LogOut,
   MessageSquareText,
   Plus,
+  User,
 } from 'lucide-react'
 import { NavLink, Outlet, useNavigate, useParams } from 'react-router-dom'
 
+import { Badge } from '@/components/ui/badge'
 import { useProfessorData } from '@/hooks/use-professor-data'
+import { useUser } from '@/contexts/user-context'
 import { cn } from '@/lib/utils'
 
 const navigation = [
   { label: 'Início', path: '', icon: House, end: true },
+  { label: 'Meu perfil', path: 'perfil', icon: User, end: true },
   { label: 'Adicionar', path: 'videoaulas/nova', icon: Plus, end: true },
   { label: 'Videoaulas', path: 'videoaulas', icon: BookOpen, end: true },
   { label: 'Avaliações', path: 'avaliacoes', icon: MessageSquareText },
@@ -24,10 +28,11 @@ export function ProfessorLayout() {
   const navigate = useNavigate()
   const { idProfessor } = useParams()
   const { professor } = useProfessorData(idProfessor, { profile: true })
+  const { usuario, setUsuario } = useUser()
   const basePath = `/professor/${idProfessor}`
 
   function handleLogout() {
-    localStorage.removeItem('usuario')
+    setUsuario(null)
     navigate('/')
   }
 
@@ -52,9 +57,25 @@ export function ProfessorLayout() {
           <div className="flex items-center gap-4">
             <div className="text-right">
               <span className="block text-sm font-semibold text-slate-900">
-                {professor?.nome || `Professor #${idProfessor}`}
+                {usuario?.nome || professor?.nome || `Professor #${idProfessor}`}
               </span>
-              <span className="block text-xs text-slate-500">Professor</span>
+              <span className="mt-1 inline-flex items-center gap-2 text-xs text-slate-500">
+                <span>Professor</span>
+                {professor?.statusValidacao && (
+                  <Badge
+                    variant={
+                      professor.statusValidacao === 'pendente'
+                        ? 'secondary'
+                        : 'outline'
+                    }
+                    className="rounded-full px-2 py-1 text-[10px]"
+                  >
+                    {professor.statusValidacao === 'pendente'
+                      ? 'Pendente'
+                      : 'Aprovado'}
+                  </Badge>
+                )}
+              </span>
             </div>
 
             <button
