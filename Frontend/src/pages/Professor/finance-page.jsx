@@ -18,6 +18,14 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import {
   Table,
   TableBody,
   TableCell,
@@ -32,6 +40,20 @@ const currency = new Intl.NumberFormat('pt-BR', {
   style: 'currency',
   currency: 'BRL',
 })
+
+const withdrawalDestinations = [
+  { value: 'bank', label: 'Conta bancaria' },
+  { value: 'pix', label: 'Pix' },
+  { value: 'credit-card', label: 'Cartao de credito' },
+  { value: 'debit-card', label: 'Cartao de debito' },
+]
+
+function getWithdrawalDestinationLabel(value) {
+  return (
+    withdrawalDestinations.find((destination) => destination.value === value)
+      ?.label || 'destino ficticio'
+  )
+}
 
 function SummaryCard({ label, value, icon: Icon, testId }) {
   return (
@@ -55,6 +77,7 @@ export function FinancePage() {
     useProfessorData(idProfessor)
   const [withdrawOpen, setWithdrawOpen] = useState(false)
   const [withdrawAmount, setWithdrawAmount] = useState('')
+  const [withdrawDestination, setWithdrawDestination] = useState('')
   const [withdrawMessage, setWithdrawMessage] = useState('')
   const [withdrawError, setWithdrawError] = useState('')
   const [withdrawnAmount, setWithdrawnAmount] = useState(0)
@@ -77,9 +100,15 @@ export function FinancePage() {
   function requestWithdrawal(event) {
     event.preventDefault()
     const amount = Number(withdrawAmount)
+    const destinationLabel = getWithdrawalDestinationLabel(withdrawDestination)
 
     if (!amount || amount <= 0) {
       setWithdrawError('Informe um valor maior que zero.')
+      return
+    }
+
+    if (!withdrawDestination) {
+      setWithdrawError('Escolha onde o dinheiro sera colocado.')
       return
     }
 
@@ -91,19 +120,20 @@ export function FinancePage() {
     setWithdrawError('')
     setWithdrawOpen(false)
     setWithdrawMessage(
-      `Solicitacao de retirada de ${currency.format(amount)} registrada como pendente.`,
+      `Solicitacao de retirada de ${currency.format(amount)} para ${destinationLabel} registrada como pendente.`,
     )
-    setPendingWithdrawal(amount)
+    setPendingWithdrawal({ amount, destinationLabel })
     setWithdrawAmount('')
+    setWithdrawDestination('')
   }
 
   useEffect(() => {
     if (!pendingWithdrawal) return undefined
 
     const timeoutId = window.setTimeout(() => {
-      setWithdrawnAmount((current) => current + pendingWithdrawal)
+      setWithdrawnAmount((current) => current + pendingWithdrawal.amount)
       setWithdrawMessage(
-        `${currency.format(pendingWithdrawal)} saiu da conta do professor.`,
+        `${currency.format(pendingWithdrawal.amount)} saiu da conta do professor para ${pendingWithdrawal.destinationLabel}.`,
       )
       setPendingWithdrawal(null)
     }, 10000)
@@ -258,6 +288,34 @@ export function FinancePage() {
               />
               <p className="text-sm text-slate-500">
                 Maximo disponivel: {currency.format(availableBalance)}
+              </p>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="withdraw-destination">
+                Onde colocar o dinheiro
+              </Label>
+              <Select
+                value={withdrawDestination}
+                onValueChange={setWithdrawDestination}
+              >
+                <SelectTrigger id="withdraw-destination" className="w-full">
+                  <SelectValue placeholder="Selecione uma opcao ficticia" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    {withdrawalDestinations.map((destination) => (
+                      <SelectItem
+                        key={destination.value}
+                        value={destination.value}
+                      >
+                        {destination.label}
+                      </SelectItem>
+                    ))}
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+              <p className="text-sm text-slate-500">
+                Esta escolha e apenas demonstrativa e nao realiza transferencia real.
               </p>
               {withdrawError && (
                 <p className="text-sm text-destructive">{withdrawError}</p>
