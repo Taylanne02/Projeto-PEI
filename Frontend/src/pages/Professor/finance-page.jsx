@@ -1,4 +1,13 @@
-import { Banknote, CircleDollarSign, Percent, TrendingUp } from 'lucide-react'
+import {
+  Banknote,
+  Building2,
+  CircleDollarSign,
+  CreditCard,
+  Percent,
+  Smartphone,
+  TrendingUp,
+  WalletCards,
+} from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 
@@ -18,14 +27,6 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
-import {
   Table,
   TableBody,
   TableCell,
@@ -42,10 +43,15 @@ const currency = new Intl.NumberFormat('pt-BR', {
 })
 
 const withdrawalDestinations = [
-  { value: 'bank', label: 'Conta bancaria' },
-  { value: 'pix', label: 'Pix' },
-  { value: 'credit-card', label: 'Cartao de credito' },
-  { value: 'debit-card', label: 'Cartao de debito' },
+  { value: 'bank', label: 'Banco', icon: Building2, tone: 'bg-slate-900 text-white' },
+  { value: 'pix', label: 'Pix', icon: Smartphone, tone: 'bg-emerald-600 text-white' },
+  { value: 'visa', label: 'Visa', icon: CreditCard, tone: 'bg-blue-700 text-white' },
+  { value: 'mastercard', label: 'Mastercard', icon: WalletCards, tone: 'bg-red-600 text-white' },
+  { value: 'amex', label: 'Amex', icon: CreditCard, tone: 'bg-sky-600 text-white' },
+  { value: 'paypal', label: 'PayPal', icon: WalletCards, tone: 'bg-blue-500 text-white' },
+  { value: 'pagseguro', label: 'PagSeguro', icon: WalletCards, tone: 'bg-lime-600 text-white' },
+  { value: 'credit-card', label: 'Credito', icon: CreditCard, tone: 'bg-indigo-600 text-white' },
+  { value: 'debit-card', label: 'Debito', icon: CreditCard, tone: 'bg-zinc-700 text-white' },
 ]
 
 function getWithdrawalDestinationLabel(value) {
@@ -294,26 +300,35 @@ export function FinancePage() {
               <Label htmlFor="withdraw-destination">
                 Onde colocar o dinheiro
               </Label>
-              <Select
-                value={withdrawDestination}
-                onValueChange={setWithdrawDestination}
+              <div
+                id="withdraw-destination"
+                className="grid grid-cols-3 gap-2"
+                role="radiogroup"
+                aria-label="Onde colocar o dinheiro"
               >
-                <SelectTrigger id="withdraw-destination" className="w-full">
-                  <SelectValue placeholder="Selecione uma opcao ficticia" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectGroup>
-                    {withdrawalDestinations.map((destination) => (
-                      <SelectItem
-                        key={destination.value}
-                        value={destination.value}
-                      >
-                        {destination.label}
-                      </SelectItem>
-                    ))}
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
+                {withdrawalDestinations.map((destination) => {
+                  const Icon = destination.icon
+                  const selected = withdrawDestination === destination.value
+
+                  return (
+                    <button
+                      key={destination.value}
+                      type="button"
+                      role="radio"
+                      aria-checked={selected}
+                      className={`flex h-12 items-center gap-2 rounded-md border px-2 text-left text-xs font-bold transition ${
+                        selected
+                          ? 'border-indigo-600 ring-2 ring-indigo-300'
+                          : 'border-slate-200 hover:border-indigo-300'
+                      } ${destination.tone}`}
+                      onClick={() => setWithdrawDestination(destination.value)}
+                    >
+                      <Icon className="size-4 shrink-0" />
+                      <span className="truncate">{destination.label}</span>
+                    </button>
+                  )
+                })}
+              </div>
               <p className="text-sm text-slate-500">
                 Esta escolha e apenas demonstrativa e nao realiza transferencia real.
               </p>
