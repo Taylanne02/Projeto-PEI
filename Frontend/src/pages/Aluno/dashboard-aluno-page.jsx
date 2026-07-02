@@ -105,7 +105,7 @@ export function DashboardAlunoPage() {
           className="rounded-xl border bg-white p-5 transition hover:border-indigo-600"
         >
           <ShoppingBag className="mb-4 text-indigo-600" />
-          <h3 className="font-semibold">Minhas compras</h3>
+          <h3 className="font-semibold">Minhas aulas</h3>
           <p className="mt-1 text-sm text-slate-600">
             Acompanhe os cursos adquiridos e continue seus estudos.
           </p>
