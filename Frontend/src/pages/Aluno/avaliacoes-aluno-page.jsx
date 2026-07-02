@@ -1,10 +1,31 @@
 import { useState, useEffect } from 'react'
 import { api } from '../../services/api'
+import { Button } from '@/components/ui/button'
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
+import { Textarea } from '@/components/ui/textarea'
+import { Label } from '@/components/ui/label'
 
 export function AvaliacoesAlunoPage() {
   const [avaliacoes, setAvaliacoes] = useState([])
   const [carregando, setCarregando] = useState(true)
   const [erro, setErro] = useState(null)
+  const [formAberto, setFormAberto] = useState(false)
+  const [formErro, setFormErro] = useState('')
+  const [salvandoAvaliacao, setSalvandoAvaliacao] = useState(false)
+  const [removendoAvaliacao, setRemovendoAvaliacao] = useState(false)
+  const [avaliacaoForm, setAvaliacaoForm] = useState({
+    id_avaliacao: null,
+    nota: 5,
+    comentario: '',
+    titulo: '',
+  })
 
   useEffect(() => {
     buscarAvaliacoes()
@@ -25,6 +46,70 @@ export function AvaliacoesAlunoPage() {
       setAvaliacoes([])
     } finally {
       setCarregando(false)
+    }
+  }
+
+  function abrirFormularioAvaliacao(avaliacao) {
+    setAvaliacaoForm({
+      id_avaliacao: avaliacao.id_avaliacao,
+      nota: avaliacao.nota || 5,
+      comentario: avaliacao.comentario || '',
+      titulo: avaliacao.titulo || '',
+    })
+    setFormErro('')
+    setFormAberto(true)
+  }
+
+  function fecharFormularioAvaliacao() {
+    setFormAberto(false)
+    setFormErro('')
+    setAvaliacaoForm({
+      id_avaliacao: null,
+      nota: 5,
+      comentario: '',
+      titulo: '',
+    })
+  }
+
+  async function salvarAvaliacao() {
+    if (!avaliacaoForm.nota) {
+      setFormErro('Escolha uma nota entre 1 e 5.')
+      return
+    }
+
+    try {
+      setSalvandoAvaliacao(true)
+      setFormErro('')
+
+      await api.updateReview(avaliacaoForm.id_avaliacao, {
+        nota: avaliacaoForm.nota,
+        comentario: avaliacaoForm.comentario,
+      })
+
+      setAvaliacoes((current) =>
+        current.map((avaliacao) =>
+          avaliacao.id_avaliacao === avaliacaoForm.id_avaliacao
+            ? { ...avaliacao, nota: avaliacaoForm.nota, comentario: avaliacaoForm.comentario }
+            : avaliacao,
+        ),
+      )
+      fecharFormularioAvaliacao()
+    } catch (e) {
+      setFormErro(e.message || 'Não foi possível salvar a avaliação.')
+    } finally {
+      setSalvandoAvaliacao(false)
+    }
+  }
+
+  async function excluirAvaliacao(idAvaliacao) {
+    try {
+      setRemovendoAvaliacao(true)
+      await api.deleteReview(idAvaliacao)
+      setAvaliacoes((current) => current.filter((item) => item.id_avaliacao !== idAvaliacao))
+    } catch (e) {
+      setErro(e.message || 'Não foi possível excluir a avaliação.')
+    } finally {
+      setRemovendoAvaliacao(false)
     }
   }
 
@@ -111,12 +196,94 @@ export function AvaliacoesAlunoPage() {
                       "{avaliacao.comentario}"
                     </p>
                   )}
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    <Button size="sm" variant="outline" onClick={() => abrirFormularioAvaliacao(avaliacao)}>
+                      Editar
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => excluirAvaliacao(avaliacao.id_avaliacao)}
+                      disabled={removendoAvaliacao}
+                    >
+                      Excluir
+                    </Button>
+                  </div>
                 </div>
               </div>
             </div>
           ))}
         </div>
       )}
+
+      <Dialog open={formAberto} onOpenChange={(open) => !open && fecharFormularioAvaliacao()}>
+        <DialogContent className="max-w-xl">
+          <DialogHeader>
+            <DialogTitle>Editar avaliação</DialogTitle>
+            <DialogDescription>
+              Atualize sua nota e comentário.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4">
+            <div>
+              <p className="text-sm font-semibold text-slate-700">{avaliacaoForm.titulo}</p>
+            </div>
+
+            <div>
+              <Label htmlFor="nota" className="mb-2 block text-sm font-medium text-slate-700">
+                Nota
+              </Label>
+              <div className="flex gap-2">
+                {[1, 2, 3, 4, 5].map((value) => (
+                  <button
+                    key={value}
+                    type="button"
+                    className={`rounded-full border px-3 py-2 text-sm font-semibold ${
+                      avaliacaoForm.nota >= value
+                        ? 'border-yellow-400 bg-yellow-100 text-slate-950'
+                        : 'border-slate-300 bg-white text-slate-600'
+                    }`}
+                    onClick={() => setAvaliacaoForm((current) => ({ ...current, nota: value }))}
+                  >
+                    {value}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="comentario" className="text-sm font-medium text-slate-700">
+                Comentário (opcional)
+              </Label>
+              <Textarea
+                id="comentario"
+                value={avaliacaoForm.comentario}
+                onChange={(event) =>
+                  setAvaliacaoForm((current) => ({ ...current, comentario: event.target.value }))
+                }
+                rows={4}
+                placeholder="Conte como foi a aula"
+              />
+            </div>
+
+            {formErro && (
+              <div className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+                {formErro}
+              </div>
+            )}
+
+            <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
+              <DialogClose asChild>
+                <Button variant="secondary">Cancelar</Button>
+              </DialogClose>
+              <Button onClick={salvarAvaliacao} disabled={salvandoAvaliacao}>
+                {salvandoAvaliacao ? 'Salvando...' : 'Salvar alterações'}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
