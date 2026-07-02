@@ -110,7 +110,7 @@ export function LessonForm({
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="lesson-tumblr">Link do Tumblr</Label>
+        <Label htmlFor="lesson-tumblr">Link da vídeoaula</Label>
         <Input
           id="lesson-tumblr"
           type="url"

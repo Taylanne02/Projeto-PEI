@@ -17,11 +17,11 @@ import { cn } from '@/lib/utils'
 
 const navigation = [
   { label: 'Início', path: '', icon: House, end: true },
-  { label: 'Meu perfil', path: 'perfil', icon: User, end: true },
   { label: 'Adicionar', path: 'videoaulas/nova', icon: Plus, end: true },
   { label: 'Videoaulas', path: 'videoaulas', icon: BookOpen, end: true },
   { label: 'Avaliações', path: 'avaliacoes', icon: MessageSquareText },
   { label: 'Financeiro', path: 'financeiro', icon: CircleDollarSign },
+  { label: 'Meu perfil', path: 'perfil', icon: User, end: true },
 ]
 
 export function ProfessorLayout() {
