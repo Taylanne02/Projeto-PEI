@@ -79,7 +79,11 @@ export function DashboardAlunoPage() {
         <div className="rounded-xl border bg-white p-6">
           <p className="text-sm text-slate-600">Avaliações feitas</p>
           <h2 className="mt-2 text-2xl font-bold">
-            {carregando ? '...' : stats.totalAvaliacoes} avaliação{stats.totalAvaliacoes !== 1 ? 'ões' : ''}
+            {carregando
+            ? '...'
+            : `${stats.totalAvaliacoes} ${
+              stats.totalAvaliacoes === 1 ? 'avaliação' : 'avaliações'
+              }`}
           </h2>
         </div>
       </div>
