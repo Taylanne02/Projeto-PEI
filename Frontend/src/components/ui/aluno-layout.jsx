@@ -15,7 +15,7 @@ import { useUser } from '@/contexts/user-context'
 const navigation = [
   { label: 'Início', path: '', icon: House, end: true },
   { label: 'Cursos', path: 'cursos', icon: BookOpen },
-  { label: 'Minhas aulas', path: 'compras', icon: ShoppingBag },
+  { label: 'Minhas aulas', path: 'aulas', icon: ShoppingBag },
   { label: 'Avaliações', path: 'avaliacoes', icon: Star },
   { label: 'Meu perfil', path: 'perfil', icon: User },
 ]
