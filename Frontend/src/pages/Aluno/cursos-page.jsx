@@ -23,6 +23,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
+import ReviewsDialog from '@/components/reviews-dialog'
 
 function LessonThumbnail({ thumbnailUrl, titulo }) {
   if (thumbnailUrl) {
@@ -59,6 +60,7 @@ export function CursosPage() {
   const [pagamentoAberto, setPagamentoAberto] = useState(false)
   const [formaPagamento, setFormaPagamento] = useState('')
   const [erroPagamento, setErroPagamento] = useState('')
+  const [reviewsDialog, setReviewsDialog] = useState({ open: false, id: null, title: '' })
 
   useEffect(() => {
     buscarCursos()
@@ -422,6 +424,10 @@ export function CursosPage() {
                     </Button>
                   )}
 
+                  <Button variant="outline" onClick={() => setReviewsDialog({ open: true, id: cursoSelecionado.id_videoaula, title: cursoSelecionado.titulo })}>
+                    Ver avaliações
+                  </Button>
+
                   <Button variant="outline" onClick={denunciarAula}>
                     Denúncia
                   </Button>
@@ -435,6 +441,16 @@ export function CursosPage() {
           )}
         </DialogContent>
       </Dialog>
+
+        {/* Reviews dialog */}
+        {reviewsDialog.open && (
+          <ReviewsDialog
+            open={reviewsDialog.open}
+            onOpenChange={(open) => !open && setReviewsDialog({ open: false, id: null, title: '' })}
+            idVideoLesson={reviewsDialog.id}
+            title={reviewsDialog.title}
+          />
+        )}
 
       <Dialog open={pagamentoAberto} onOpenChange={setPagamentoAberto}>
         <DialogContent>

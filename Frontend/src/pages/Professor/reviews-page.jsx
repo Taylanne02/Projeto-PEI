@@ -1,5 +1,5 @@
 import { ImageIcon, MessageSquareText, ShoppingBag, Star } from 'lucide-react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 
 import { DataError, DataLoading } from '@/components/data-state'
@@ -82,6 +82,16 @@ export function ReviewsPage() {
       setLoadingLesson(null)
     }
   }
+
+  // Preload reviews for all lessons so professor sees them without extra clicks
+  useEffect(() => {
+    if (!lessons || lessons.length === 0) return
+    lessons.forEach((lesson) => {
+      const id = lesson.id_videoaula
+      loadReviews(id)
+    })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lessons])
 
   if (loading) return <DataLoading />
   if (error) return <DataError error={error} onRetry={refresh} />

@@ -18,6 +18,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
+import ReviewsDialog from '@/components/reviews-dialog'
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
 
@@ -42,6 +43,7 @@ export function ComprasPage() {
     nota: 5,
     comentario: '',
   })
+  const [reviewsDialog, setReviewsDialog] = useState({ open: false, id: null, title: '' })
 
   useEffect(() => {
     buscarCompras()
@@ -322,6 +324,11 @@ export function ComprasPage() {
                         Avaliar aula
                       </Button>
                     )}
+                    <div className="flex justify-end">
+                      <Button variant="outline" onClick={() => setReviewsDialog({ open: true, id: compra.id_videoaula, title: compra.titulo })}>
+                        Ver avaliações
+                      </Button>
+                    </div>
                     {reportandoAula && reportTargetId === compra.id_videoaula ? (
                       <div className="space-y-4 rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-700">
                         <div>
@@ -445,6 +452,16 @@ export function ComprasPage() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Reviews dialog */}
+      {reviewsDialog.open && (
+        <ReviewsDialog
+          open={reviewsDialog.open}
+          onOpenChange={(open) => !open && setReviewsDialog({ open: false, id: null, title: '' })}
+          idVideoLesson={reviewsDialog.id}
+          title={reviewsDialog.title}
+        />
+      )}
     </div>
   )
 }
