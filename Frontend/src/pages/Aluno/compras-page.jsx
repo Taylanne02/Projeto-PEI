@@ -18,7 +18,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
 
@@ -31,6 +30,11 @@ export function ComprasPage() {
   const [formErro, setFormErro] = useState('')
   const [salvandoAvaliacao, setSalvandoAvaliacao] = useState(false)
   const [removendoAvaliacao, setRemovendoAvaliacao] = useState(false)
+  const [reportandoAula, setReportandoAula] = useState(false)
+  const [reportTargetId, setReportTargetId] = useState(null)
+  const [reportType, setReportType] = useState('')
+  const [reportDetail, setReportDetail] = useState('')
+  const [reportMessage, setReportMessage] = useState('')
   const [avaliacaoForm, setAvaliacaoForm] = useState({
     id_videoaula: null,
     id_avaliacao: null,
@@ -176,6 +180,35 @@ export function ComprasPage() {
     }
   }
 
+  function abrirDenuncia(compra) {
+    setReportTargetId(compra.id_videoaula)
+    setReportandoAula(true)
+    setReportType('')
+    setReportDetail('')
+    setReportMessage('')
+  }
+
+  function cancelarDenuncia() {
+    setReportTargetId(null)
+    setReportandoAula(false)
+    setReportType('')
+    setReportDetail('')
+    setReportMessage('')
+  }
+
+  function enviarDenuncia() {
+    if (!reportType) {
+      setReportMessage('Selecione o tipo de denúncia.')
+      return
+    }
+
+    setReportMessage('Denúncia registrada. A equipe irá analisar.')
+    setReportandoAula(false)
+    setReportTargetId(null)
+    setReportType('')
+    setReportDetail('')
+  }
+
   return (
     <div>
       <h1 className="text-3xl font-bold text-slate-950">Minhas aulas</h1>
@@ -183,6 +216,12 @@ export function ComprasPage() {
       <p className="mt-2 text-slate-600">
         Acompanhe as aulas adquiridas, abra o link e avalie o conteúdo.
       </p>
+
+      {reportMessage && !reportandoAula && (
+        <div className="mt-4 rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-900">
+          {reportMessage}
+        </div>
+      )}
 
       {carregando && (
         <div className="mt-8 rounded-xl border bg-white p-10 text-center text-slate-600">
@@ -287,6 +326,53 @@ export function ComprasPage() {
                     ) : (
                       <Button onClick={() => abrirFormularioAvaliacao(compra)}>
                         Avaliar aula
+                      </Button>
+                    )}
+                    {reportandoAula && reportTargetId === compra.id_videoaula ? (
+                      <div className="space-y-4 rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-700">
+                        <div>
+                          <Label htmlFor="report-type" className="mb-2 block text-sm font-medium text-slate-700">
+                            Tipo de denúncia
+                          </Label>
+                          <select
+                            id="report-type"
+                            value={reportType}
+                            onChange={(event) => setReportType(event.target.value)}
+                            className="w-full rounded-lg border border-input bg-transparent px-3 py-2 text-sm outline-none focus:border-ring focus:ring-2 focus:ring-ring/50"
+                          >
+                            <option value="">Selecione um tipo</option>
+                            <option value="conteudo-inadequado">Conteúdo inadequado</option>
+                            <option value="erro-na-aula">Erro na aula</option>
+                            <option value="problema-tecnico">Problema técnico</option>
+                            <option value="outro">Outro</option>
+                          </select>
+                        </div>
+                        <div>
+                          <Label htmlFor="report-detail" className="mb-2 block text-sm font-medium text-slate-700">
+                            Detalhes (opcional)
+                          </Label>
+                          <Textarea
+                            id="report-detail"
+                            value={reportDetail}
+                            onChange={(event) => setReportDetail(event.target.value)}
+                            placeholder="Explique melhor se quiser"
+                          />
+                        </div>
+                        {reportMessage && (
+                          <div className="rounded-xl border border-indigo-200 bg-indigo-50 p-3 text-sm text-slate-900">
+                            {reportMessage}
+                          </div>
+                        )}
+                        <div className="flex flex-col gap-2 sm:flex-row">
+                          <Button onClick={enviarDenuncia}>Enviar denúncia</Button>
+                          <Button variant="outline" onClick={cancelarDenuncia}>
+                            Cancelar
+                          </Button>
+                        </div>
+                      </div>
+                    ) : (
+                      <Button variant="outline" onClick={() => abrirDenuncia(compra)}>
+                        Denunciar aula
                       </Button>
                     )}
                   </div>

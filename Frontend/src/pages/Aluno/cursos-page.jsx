@@ -17,8 +17,6 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
-import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
 
 function LessonThumbnail({ thumbnailUrl, titulo }) {
   if (thumbnailUrl) {
@@ -45,9 +43,6 @@ export function CursosPage() {
   const [cursoSelecionado, setCursoSelecionado] = useState(null)
   const [linkVisivel, setLinkVisivel] = useState(false)
   const [mensagem, setMensagem] = useState('')
-  const [showReportForm, setShowReportForm] = useState(false)
-  const [reportType, setReportType] = useState('')
-  const [reportDetail, setReportDetail] = useState('')
   const [carregandoCompra, setCarregandoCompra] = useState(false)
   const [comprasIds, setComprasIds] = useState(new Set())
 
@@ -101,35 +96,12 @@ export function CursosPage() {
     setCursoSelecionado(curso)
     setLinkVisivel(false)
     setMensagem('')
-    setShowReportForm(false)
-    setReportType('')
-    setReportDetail('')
   }
 
   function fecharModal() {
     setCursoSelecionado(null)
     setLinkVisivel(false)
     setMensagem('')
-    setShowReportForm(false)
-    setReportType('')
-    setReportDetail('')
-  }
-
-  function denunciarAula() {
-    setShowReportForm(true)
-    setMensagem('')
-  }
-
-  function enviarDenuncia() {
-    if (!reportType) {
-      setMensagem('Selecione o tipo de denúncia.')
-      return
-    }
-
-    setMensagem('Denúncia registrada. A equipe irá analisar.')
-    setShowReportForm(false)
-    setReportType('')
-    setReportDetail('')
   }
 
   return (
@@ -261,65 +233,23 @@ export function CursosPage() {
                 </div>
               )}
 
-              {showReportForm ? (
-                <div className="space-y-4 rounded-xl border border-slate-200 bg-slate-50 p-4">
-                  <div>
-                    <Label htmlFor="report-type" className="mb-2 block text-sm font-medium text-slate-700">
-                      Tipo de denúncia
-                    </Label>
-                    <select
-                      id="report-type"
-                      value={reportType}
-                      onChange={(event) => setReportType(event.target.value)}
-                      className="w-full rounded-lg border border-input bg-transparent px-3 py-2 text-sm outline-none focus:border-ring focus:ring-2 focus:ring-ring/50"
-                    >
-                      <option value="">Selecione um tipo</option>
-                      <option value="conteudo-inadequado">Conteúdo inadequado</option>
-                      <option value="erro-na-aula">Erro na aula</option>
-                      <option value="problema-tecnico">Problema técnico</option>
-                      <option value="outro">Outro</option>
-                    </select>
-                  </div>
-                  <div>
-                    <Label htmlFor="report-detail" className="mb-2 block text-sm font-medium text-slate-700">
-                      Detalhes (opcional)
-                    </Label>
-                    <Textarea
-                      id="report-detail"
-                      value={reportDetail}
-                      onChange={(event) => setReportDetail(event.target.value)}
-                      placeholder="Explique melhor se quiser"
-                    />
-                  </div>
-                  <div className="flex flex-col gap-2 sm:flex-row">
-                    <Button onClick={enviarDenuncia}>Enviar denúncia</Button>
-                    <Button variant="outline" onClick={() => setShowReportForm(false)}>
-                      Cancelar
-                    </Button>
-                  </div>
-                </div>
-              ) : (
-                <div className="flex flex-col gap-3 sm:flex-row">
-                  <Button
-                    onClick={adquirirAula}
-                    disabled={
-                      carregandoCompra || linkVisivel || comprasIds.has(cursoSelecionado.id_videoaula)
-                    }
-                  >
-                    {comprasIds.has(cursoSelecionado.id_videoaula)
-                      ? 'Já adquirido'
-                      : linkVisivel
-                      ? 'Aula adquirida'
-                      : 'Adquirir aula'}
-                  </Button>
-                  <Button variant="outline" onClick={denunciarAula}>
-                    Denúncia
-                  </Button>
-                  <DialogClose asChild>
-                    <Button variant="secondary">Fechar</Button>
-                  </DialogClose>
-                </div>
-              )}
+              <div className="flex flex-col gap-3 sm:flex-row">
+                <Button
+                  onClick={adquirirAula}
+                  disabled={
+                    carregandoCompra || linkVisivel || comprasIds.has(cursoSelecionado.id_videoaula)
+                  }
+                >
+                  {comprasIds.has(cursoSelecionado.id_videoaula)
+                    ? 'Já adquirido'
+                    : linkVisivel
+                    ? 'Aula adquirida'
+                    : 'Adquirir aula'}
+                </Button>
+                <DialogClose asChild>
+                  <Button variant="secondary">Fechar</Button>
+                </DialogClose>
+              </div>
             </div>
           )}
         </DialogContent>
