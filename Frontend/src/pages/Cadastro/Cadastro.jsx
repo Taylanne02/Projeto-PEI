@@ -79,7 +79,7 @@ export default function Cadastro() {
       navigate("/login");
     }, 1000);
 
-  } catch (error) {
+  } catch {
     setMensagem("Erro ao conectar com o servidor.");
   }
 }

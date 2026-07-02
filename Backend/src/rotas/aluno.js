@@ -47,6 +47,9 @@ router.get("/professor/:id_professor", (req, res) => {
         usuario.email,
         professor.foto,
         professor.biografia,
+        professor.faculdade,
+        professor.dataNascimento,
+        professor.cidade,
         professor.saldoComissao,
         professor.listaVideoAulas,
         professor.statusValidacao

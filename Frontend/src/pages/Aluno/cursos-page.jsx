@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { Link, useParams } from 'react-router-dom'
 import { ExternalLink, ImageIcon, ShoppingBag } from 'lucide-react'
 import { api } from '../../services/api'
 
@@ -42,6 +43,7 @@ function LessonThumbnail({ thumbnailUrl, titulo }) {
 }
 
 export function CursosPage() {
+  const { idAluno } = useParams()
   const [cursos, setCursos] = useState([])
   const [carregando, setCarregando] = useState(true)
   const [erro, setErro] = useState(null)
@@ -178,6 +180,9 @@ export function CursosPage() {
 
   const aulaJaAdquirida =
     cursoSelecionado && comprasIds.has(cursoSelecionado.id_videoaula)
+  const professorSelecionadoPath = cursoSelecionado
+    ? `/aluno/${idAluno}/professores/${cursoSelecionado.id_professor}`
+    : '#'
 
   return (
     <div>
@@ -211,11 +216,7 @@ export function CursosPage() {
         <div className="mt-8 grid gap-4 lg:grid-cols-2">
           {cursos.map((curso) => (
             <Card key={curso.id_videoaula}>
-              <button
-                type="button"
-                className="group/card flex h-full w-full flex-col text-left"
-                onClick={() => abrirModal(curso)}
-              >
+              <div className="flex h-full flex-col">
                 <LessonThumbnail
                   thumbnailUrl={curso.thumbnailUrl}
                   titulo={curso.titulo}
@@ -250,17 +251,24 @@ export function CursosPage() {
                     <ShoppingBag className="size-4" />
                     <span>
                       Professor:{' '}
-                      <span className="font-semibold text-slate-950">
+                      <Link
+                        to={`/aluno/${idAluno}/professores/${curso.id_professor}`}
+                        className="font-semibold text-slate-950 underline decoration-indigo-500 underline-offset-4 hover:text-indigo-700"
+                      >
                         {curso.nomeProfessor}
-                      </span>
+                      </Link>
                     </span>
                   </div>
 
-                  <div className="mt-4 rounded-xl bg-slate-50 px-3 py-2 text-sm font-semibold text-slate-900">
+                  <button
+                    type="button"
+                    onClick={() => abrirModal(curso)}
+                    className="mt-4 w-full rounded-xl bg-slate-50 px-3 py-2 text-left text-sm font-semibold text-slate-900 transition-colors hover:bg-slate-100"
+                  >
                     Ver detalhes
-                  </div>
+                  </button>
                 </CardContent>
-              </button>
+              </div>
             </Card>
           ))}
         </div>
@@ -283,9 +291,13 @@ export function CursosPage() {
               <div className="grid gap-4 sm:grid-cols-2">
                 <div>
                   <p className="text-sm text-slate-600">Professor</p>
-                  <p className="mt-1 font-semibold text-slate-950">
+                  <Link
+                    to={professorSelecionadoPath}
+                    className="mt-1 inline-block font-semibold text-slate-950 underline decoration-indigo-500 underline-offset-4 hover:text-indigo-700"
+                    onClick={fecharModal}
+                  >
                     {cursoSelecionado.nomeProfessor}
-                  </p>
+                  </Link>
                 </div>
 
                 <div>

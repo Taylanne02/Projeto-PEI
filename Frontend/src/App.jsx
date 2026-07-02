@@ -7,12 +7,14 @@ import { DashboardPage } from '@/pages/Professor/dashboard-page'
 import { FinancePage } from '@/pages/Professor/finance-page'
 import { LessonsPage } from '@/pages/Professor/lessons-page'
 import { NewLessonPage } from '@/pages/Professor/new-lesson-page'
+import { PerfilProfessorPage } from '@/pages/Professor/perfil-professor-page'
 import { ReviewsPage } from '@/pages/Professor/reviews-page'
 
 import { DashboardAlunoPage } from '@/pages/Aluno/dashboard-aluno-page'
 import { CursosPage } from '@/pages/Aluno/cursos-page'
 import { ComprasPage } from '@/pages/Aluno/compras-page'
 import { AvaliacoesAlunoPage } from '@/pages/Aluno/avaliacoes-aluno-page'
+import { BiografiaProfessorPage } from '@/pages/Aluno/biografia-professor-page'
 import { PerfilPage } from '@/pages/Aluno/perfil-aluno-page'
 
 import Home from '@/pages/Home/Home'
@@ -35,12 +37,13 @@ export function AppRoutes() {
         <Route path="videoaulas" element={<LessonsPage />} />
         <Route path="avaliacoes" element={<ReviewsPage />} />
         <Route path="financeiro" element={<FinancePage />} />
-        <Route path="perfil" element={<PerfilPage />} />
+        <Route path="perfil" element={<PerfilProfessorPage />} />
       </Route>
 
       <Route path="/aluno/:idAluno" element={<AlunoLayout />}>
         <Route index element={<DashboardAlunoPage />} />
         <Route path="cursos" element={<CursosPage />} />
+        <Route path="professores/:idProfessor" element={<BiografiaProfessorPage />} />
         <Route path="compras" element={<ComprasPage />} />
         <Route path="avaliacoes" element={<AvaliacoesAlunoPage />} />
         <Route path="perfil" element={<PerfilPage />} />

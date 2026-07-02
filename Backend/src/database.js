@@ -46,6 +46,27 @@ db.exec(`
         `);
         }
 
+        if (!professorColumns.includes('faculdade')) {
+        db.exec(`
+            ALTER TABLE professor
+            ADD COLUMN faculdade TEXT
+        `);
+        }
+
+        if (!professorColumns.includes('dataNascimento')) {
+        db.exec(`
+            ALTER TABLE professor
+            ADD COLUMN dataNascimento TEXT
+        `);
+        }
+
+        if (!professorColumns.includes('cidade')) {
+        db.exec(`
+            ALTER TABLE professor
+            ADD COLUMN cidade TEXT
+        `);
+        }
+
     //aluno
 db.exec(`
         CREATE TABLE IF NOT EXISTS aluno(

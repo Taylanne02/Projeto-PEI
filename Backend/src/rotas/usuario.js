@@ -5,7 +5,7 @@ const multer = require("multer");
 const upload = multer();
 
 // CADASTRAR USUÁRIO
-router.post("/", (req, res) => {
+router.post("/", upload.none(), (req, res) => {
   try {
     const { nome, email, senha, cpf, tipoUsuario } = req.body;
 

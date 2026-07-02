@@ -181,6 +181,84 @@ router.get("/:id_professor/vendas", (req, res) => {
   }
 });
 
+// PATCH- Editar biografia do professor
+router.patch("/:id_professor/biografia", (req, res) => {
+  try {
+    const { id_professor } = req.params;
+    const { nome, faculdade, dataNascimento, cidade, biografia } = req.body;
+
+    const professor = db
+      .prepare(`
+        SELECT professor.*, usuario.nome
+        FROM professor
+        INNER JOIN usuario ON professor.id_usuario = usuario.id_usuario
+        WHERE professor.id_professor = ?
+      `)
+      .get(id_professor);
+
+    if (!professor) {
+      return res.status(404).json({ erro: "Professor nao encontrado" });
+    }
+
+    if (nome !== undefined) {
+      const nomeTratado = String(nome).trim();
+
+      if (!nomeTratado) {
+        return res.status(400).json({ erro: "Nome e obrigatorio" });
+      }
+
+      db.prepare(`
+        UPDATE usuario
+        SET nome = ?
+        WHERE id_usuario = ?
+      `).run(nomeTratado, professor.id_usuario);
+    }
+
+    db.prepare(`
+      UPDATE professor
+      SET faculdade = ?,
+          dataNascimento = ?,
+          cidade = ?,
+          biografia = ?
+      WHERE id_professor = ?
+    `).run(
+      faculdade || "",
+      dataNascimento || "",
+      cidade || "",
+      biografia || "",
+      id_professor
+    );
+
+    const professorAtualizado = db.prepare(`
+      SELECT
+        professor.id_professor,
+        professor.id_usuario,
+        usuario.nome,
+        usuario.email,
+        professor.foto,
+        professor.biografia,
+        professor.faculdade,
+        professor.dataNascimento,
+        professor.cidade,
+        professor.saldoComissao,
+        professor.listaVideoAulas,
+        professor.statusValidacao
+      FROM professor
+      INNER JOIN usuario ON professor.id_usuario = usuario.id_usuario
+      WHERE professor.id_professor = ?
+    `).get(id_professor);
+
+    res.status(200).json({
+      mensagem: "Biografia do professor atualizada com sucesso!",
+      professor: professorAtualizado
+    });
+
+  } catch (erro) {
+    console.log(erro);
+    res.status(500).json({ erro: "Erro ao atualizar biografia do professor" });
+  }
+});
+
 // GET- verTodosOsProfessores()
 router.get("/", (req, res) => {
   try {
@@ -244,6 +322,53 @@ router.post(
       console.log(erro);
       res.status(500).json({
         erro: "Erro ao enviar comprovante",
+      });
+    }
+  }
+);
+
+// POST- enviar foto de perfil do professor
+router.post(
+  "/:id_professor/foto",
+  upload.single("foto"),
+  (req, res) => {
+    try {
+      const { id_professor } = req.params;
+
+      const professor = db
+        .prepare("SELECT * FROM professor WHERE id_professor = ?")
+        .get(id_professor);
+
+      if (!professor) {
+        return res
+          .status(404)
+          .json({ erro: "Professor nao encontrado" });
+      }
+
+      if (!req.file) {
+        return res
+          .status(400)
+          .json({ erro: "Foto obrigatoria" });
+      }
+
+      const caminhoArquivo =
+        "uploads/fotos/" + req.file.filename;
+
+      db.prepare(`
+        UPDATE professor
+        SET foto = ?
+        WHERE id_professor = ?
+      `).run(caminhoArquivo, id_professor);
+
+      res.status(200).json({
+        mensagem: "Foto enviada com sucesso",
+        foto: caminhoArquivo,
+      });
+
+    } catch (erro) {
+      console.log(erro);
+      res.status(500).json({
+        erro: "Erro ao enviar foto",
       });
     }
   }

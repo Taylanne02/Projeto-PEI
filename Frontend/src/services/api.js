@@ -97,6 +97,12 @@ export function createApiClient(
         body: JSON.stringify(data),
       })
     },
+    updateProfessorBiography(idProfessor, data) {
+      return request(`/professor/${idProfessor}/biografia`, {
+        method: 'PATCH',
+        body: JSON.stringify(data),
+      })
+    },
   }
 }
 
