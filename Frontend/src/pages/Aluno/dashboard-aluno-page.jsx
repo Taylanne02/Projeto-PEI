@@ -72,7 +72,7 @@ export function DashboardAlunoPage() {
         <div className="rounded-xl border bg-white p-6">
           <p className="text-sm text-slate-600">Cursos adquiridos</p>
           <h2 className="mt-2 text-2xl font-bold">
-            {carregando ? '...' : stats.totalCompras} compra{stats.totalCompras !== 1 ? 's' : ''}
+            {carregando ? '...' : stats.totalCompras} curso{stats.totalCompras !== 1 ? 's' : ''}
           </h2>
         </div>
 

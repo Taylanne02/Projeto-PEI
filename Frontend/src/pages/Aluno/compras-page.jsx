@@ -217,12 +217,6 @@ export function ComprasPage() {
         Acompanhe as aulas adquiridas, abra o link e avalie o conteúdo.
       </p>
 
-      {reportMessage && !reportandoAula && (
-        <div className="mt-4 rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-900">
-          {reportMessage}
-        </div>
-      )}
-
       {carregando && (
         <div className="mt-8 rounded-xl border bg-white p-10 text-center text-slate-600">
           Carregando aulas...
