@@ -469,7 +469,7 @@ export function CursosPage() {
             </div>
 
             <p className="text-sm text-slate-500">
-              Esta etapa é apenas demonstrativa e não realiza cobrança real.
+              Após o pagamento enviaremos confirmação no e-mail cadastrado.
             </p>
 
             {erroPagamento && (
